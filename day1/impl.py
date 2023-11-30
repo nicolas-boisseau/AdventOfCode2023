@@ -2,7 +2,7 @@ import itertools
 import os.path
 #from py_linq import Enumerable
 
-from common.common import DownloadIfNotExists, DetectCurrentDay
+from common.common import DownloadIfNotExists, DetectCurrentDay, PostAnswer
 
 try:
     day = DetectCurrentDay()
@@ -24,4 +24,13 @@ def process(part, filename):
     return 0
 
 if __name__ == '__main__':
-    process(1, "sample.txt")
+    if process(1, "sample.txt") == 7:
+        print("Part 1 sample OK")
+
+        result = process(1, "input.txt")
+
+        day = DetectCurrentDay()
+        if day != 0:
+            PostAnswer(f"https://adventofcode.com/2023/day/{day}/answer", result)
+            print("Part 1 result posted !")
+

@@ -1,5 +1,6 @@
 import unittest
-from common import Capture
+from common import Capture, PostAnswer
+
 
 class CommonTests(unittest.TestCase):
 
@@ -25,4 +26,11 @@ class CommonTests(unittest.TestCase):
         self.assertEqual(result[1], "6")
         self.assertEqual(result[2], "12")
         self.assertEqual(result[3], "24")
+
+    def test_PostAnswer(self):
+        # arrange
+        url = "https://adventofcode.com/2022/day/1/answer"
+
+        # act
+        result = PostAnswer(url, "67016")
 

@@ -1,6 +1,8 @@
 import os
 import re
+import urllib
 from urllib import request
+import requests
 
 def DownloadIfNotExists(url):
     # Download the file from `url` and save it locally under `file_name`:
@@ -12,6 +14,7 @@ def DownloadIfNotExists(url):
     r = request.Request(url)
 
     session = os.getenv("ADVENTOFCODE_SESSION")
+
     r.add_header("Cookie", f"session={session}")
     with request.urlopen(r) as response, open(file_name, 'wb') as out_file:
         data = response.read()
@@ -24,6 +27,25 @@ def DetectCurrentDay():
     if len(match) == 0:
         return 0
     return int(match[0])
+
+def PostAnswer(url, answer):
+    r = request.Request(url)
+
+    session = os.getenv("ADVENTOFCODE_SESSION")
+    if session is None:
+        print("ADVENTOFCODE_SESSION env variable not set !")
+        return
+
+    data = {"answer": answer}
+    headers = {"Cookie": f"session={session}"}
+
+    response = requests.post(url, data=data, headers=headers)
+
+    print(response)
+    print(response.content)
+
+
+
 
 def Capture(inputPattern, input):
     m = re.compile(inputPattern).match(input)
