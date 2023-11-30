@@ -24,13 +24,17 @@ def process(part, filename):
     return 0
 
 if __name__ == '__main__':
-    if process(1, "sample.txt") == 7:
+
+    level = 1
+    expectedSampleResult = 7
+
+    if process(level, "sample.txt") == expectedSampleResult:
         print("Part 1 sample OK")
 
-        result = process(1, "input.txt")
+        result = process(level, "input.txt")
 
         day = DetectCurrentDay()
         if day != 0:
-            PostAnswer(f"https://adventofcode.com/2023/day/{day}/answer", result)
-            print("Part 1 result posted !")
+            PostAnswer(f"https://adventofcode.com/2023/day/{day}/answer", level, result)
+            print(f"Part {level} result posted !")
 

@@ -1,6 +1,6 @@
 import os
 import re
-import urllib
+from bs4 import BeautifulSoup as Soup
 from urllib import request
 import requests
 
@@ -28,7 +28,7 @@ def DetectCurrentDay():
         return 0
     return int(match[0])
 
-def PostAnswer(url, answer):
+def PostAnswer(url, level, answer):
     r = request.Request(url)
 
     session = os.getenv("ADVENTOFCODE_SESSION")
@@ -36,13 +36,13 @@ def PostAnswer(url, answer):
         print("ADVENTOFCODE_SESSION env variable not set !")
         return
 
-    data = {"answer": answer}
-    headers = {"Cookie": f"session={session}"}
+    data = {"level": level, "answer": answer}
+    cookies = {"session": session}
 
-    response = requests.post(url, data=data, headers=headers)
+    response = requests.post(url, data=data, cookies=cookies)
 
-    print(response)
-    print(response.content)
+    soup = Soup(response.content)
+    print(soup.find("article").text)
 
 
 

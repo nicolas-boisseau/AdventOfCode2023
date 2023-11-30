@@ -29,8 +29,8 @@ class CommonTests(unittest.TestCase):
 
     def test_PostAnswer(self):
         # arrange
-        url = "https://adventofcode.com/2022/day/1/answer"
+        url = "https://adventofcode.com/2022/day/16/answer"
 
         # act
-        result = PostAnswer(url, "67016")
+        result = PostAnswer(url, 1, "67016")
 
