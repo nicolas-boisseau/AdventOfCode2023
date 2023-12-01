@@ -4,7 +4,12 @@ from bs4 import BeautifulSoup as Soup
 from urllib import request
 import requests
 
-def DownloadIfNotExists(url):
+def DownloadInputIfNotExists(year):
+    day = DetectCurrentDay()
+    if day == 0:
+        return
+    url = f"https://adventofcode.com/{year}/day/{day}/input"
+
     # Download the file from `url` and save it locally under `file_name`:
     file_name = url.split('/')[-1] + ".txt"
 
@@ -28,7 +33,12 @@ def DetectCurrentDay():
         return 0
     return int(match[0])
 
-def PostAnswer(url, level, answer):
+def PostAnswer(year, level, answer):
+    day = DetectCurrentDay()
+    if day == 0:
+        return
+    url = f"https://adventofcode.com/{year}/day/{day}/answer"
+
     r = request.Request(url)
 
     session = os.getenv("ADVENTOFCODE_SESSION")
@@ -41,7 +51,7 @@ def PostAnswer(url, level, answer):
 
     response = requests.post(url, data=data, cookies=cookies)
 
-    soup = Soup(response.content)
+    soup = Soup(response.content, features="html.parser")
     print(soup.find("article").text)
 
 

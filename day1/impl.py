@@ -5,14 +5,9 @@ from py_linq import Enumerable
 
 #from py_linq import Enumerable
 
-from common.common import DownloadIfNotExists, DetectCurrentDay, PostAnswer
+from common.common import DownloadInputIfNotExists, PostAnswer
 
-try:
-    day = DetectCurrentDay()
-    if day != 0:
-        DownloadIfNotExists(f"https://adventofcode.com/2023/day/{day}/input")
-except:
-    pass
+DownloadInputIfNotExists(2023)
 
 def process(part, filename):
     if not (os.path.exists(filename)):
@@ -72,8 +67,6 @@ if __name__ == '__main__':
         result = process(level, "input.txt")
         print(f"Part {level} result is {result}")
 
-        day = DetectCurrentDay()
-        if day != 0:
-            PostAnswer(f"https://adventofcode.com/2023/day/{day}/answer", level, result)
-            print(f"Part {level} result posted !")
+        PostAnswer(2023, level, result)
+        print(f"Part {level} result posted !")
 
