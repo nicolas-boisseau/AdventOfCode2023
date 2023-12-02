@@ -1,13 +1,11 @@
-import itertools
 import os.path
 
 from py_linq import Enumerable
 
-#from py_linq import Enumerable
+from common.common import download_input_if_not_exists, post_answer
 
-from common.common import DownloadInputIfNotExists, PostAnswer
+download_input_if_not_exists(2023)
 
-DownloadInputIfNotExists(2023)
 
 def process(part, filename):
     if not (os.path.exists(filename)):
@@ -17,32 +15,33 @@ def process(part, filename):
 
     total = 0
     with open(filename) as f:
-        lines = [l.replace("\n", "") for l in f.readlines()]
+        lines = [line.replace("\n", "") for line in f.readlines()]
 
         for line in lines:
 
             if part == 2:
-                line = replaceNumbers(line)
+                line = replace_numbers(line)
 
-            letters = Enumerable([l for l in line])
-            digits = letters.where(lambda l: l.isdigit())
-            #print(digits)
+            letters = Enumerable([letter for letter in line])
+            digits = letters.where(lambda char: char.isdigit())
+            # print(digits)
 
             number = int(digits.to_list()[0] + digits.to_list()[-1])
-            #print(number)
+            # print(number)
             total += number
-
 
     return total
 
-def replaceNumbers(line):
-    newLineSoFar = ""
-    for l in line:
-        newLineSoFar += l
-        newLineSoFar = replaceNumberRaw(newLineSoFar)
-    return newLineSoFar
 
-def replaceNumberRaw(line):
+def replace_numbers(line):
+    new_line_so_far = ""
+    for char in line:
+        new_line_so_far += char
+        new_line_so_far = replace_number_raw(new_line_so_far)
+    return new_line_so_far
+
+
+def replace_number_raw(line):
     line = line.replace("one", "1")
     line = line.replace("two", "2")
     line = line.replace("three", "3")
@@ -54,6 +53,7 @@ def replaceNumberRaw(line):
     line = line.replace("nine", "9")
     # line = line.replace("zero", "0")
     return line
+
 
 if __name__ == '__main__':
 
@@ -67,6 +67,5 @@ if __name__ == '__main__':
         result = process(level, "input.txt")
         print(f"Part {level} result is {result}")
 
-        PostAnswer(2023, level, result)
+        post_answer(2023, level, result)
         print(f"Part {level} result posted !")
-

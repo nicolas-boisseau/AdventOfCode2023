@@ -4,8 +4,9 @@ from bs4 import BeautifulSoup as Soup
 from urllib import request
 import requests
 
-def DownloadInputIfNotExists(year):
-    day = DetectCurrentDay()
+
+def download_input_if_not_exists(year):
+    day = detect_current_day()
     if day == 0:
         return
     url = f"https://adventofcode.com/{year}/day/{day}/input"
@@ -25,7 +26,8 @@ def DownloadInputIfNotExists(year):
         data = response.read()
         out_file.write(data)
 
-def DetectCurrentDay():
+
+def detect_current_day():
     current_dir = os.getcwd()
     day_pattern = re.compile(r"day(\d+)")
     match = day_pattern.findall(current_dir)
@@ -33,13 +35,12 @@ def DetectCurrentDay():
         return 0
     return int(match[0])
 
-def PostAnswer(year, level, answer):
-    day = DetectCurrentDay()
+
+def post_answer(year, level, answer):
+    day = detect_current_day()
     if day == 0:
         return
     url = f"https://adventofcode.com/{year}/day/{day}/answer"
-
-    r = request.Request(url)
 
     session = os.getenv("ADVENTOFCODE_SESSION")
     if session is None:
@@ -55,12 +56,11 @@ def PostAnswer(year, level, answer):
     print(soup.find("article").text)
 
 
-
-
-def Capture(inputPattern, input):
-    m = re.compile(inputPattern).match(input)
+def capture(input_pattern, input_data):
+    m = re.compile(input_pattern).match(input_data)
     return m.groups()
 
-def CaptureAll(inputPattern, input):
-    m = re.compile(inputPattern).findall(input)
+
+def capture_all(input_pattern, input_data):
+    m = re.compile(input_pattern).findall(input_data)
     return m

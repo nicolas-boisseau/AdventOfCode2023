@@ -2,10 +2,10 @@ import itertools
 import os.path
 #from py_linq import Enumerable
 
-from common.common import DownloadIfNotExists, DetectCurrentDay
+from common.common import DownloadIfNotExists, detect_current_day
 
 try:
-    day = DetectCurrentDay()
+    day = detect_current_day()
     if day != 0:
         DownloadIfNotExists(f"https://adventofcode.com/2022/day/{day}/input")
 except:

@@ -1,13 +1,9 @@
-import itertools
 import os.path
 
-from py_linq import Enumerable
+from common.common import download_input_if_not_exists, post_answer, capture, capture_all
 
-#from py_linq import Enumerable
+download_input_if_not_exists(2023)
 
-from common.common import DownloadInputIfNotExists, PostAnswer, Capture, CaptureAll
-
-DownloadInputIfNotExists(2023)
 
 def process(part, filename):
     if not (os.path.exists(filename)):
@@ -18,44 +14,46 @@ def process(part, filename):
     total_part1 = 0
     total_part2 = 0
     with open(filename) as f:
-        lines = [l.replace("\n", "") for l in f.readlines()]
+        lines = [line.replace("\n", "") for line in f.readlines()]
 
         for line in lines:
             game = line.split(":")
-            gameId = int(Capture(r"Game (\d+)", game[0])[0])
-            print(f"Game {gameId}")
+            game_id = int(capture(r"Game (\d+)", game[0])[0])
+            print(f"Game {game_id}")
 
             plays = game[1].split(";")
-            part1_KO = False
-            minCubeCounts = {"red": 0, "blue": 0, "green": 0}
+            part1_ko = False
+            min_cube_counts = {"red": 0, "blue": 0, "green": 0}
             for play in plays:
-                cubesCounts = {"red": 0, "blue": 0, "green": 0}
+                cubes_counts = {"red": 0, "blue": 0, "green": 0}
 
-                jets = CaptureAll(r"(\d+) (red|blue|green)", play)
+                jets = capture_all(r"(\d+) (red|blue|green)", play)
                 if len(jets) == 0:
                     continue
 
                 if part == 1:
                     for jet in jets:
-                        cubesCounts[jet[1]] += int(jet[0])
+                        cubes_counts[jet[1]] += int(jet[0])
 
-                    if cubesCounts["red"] > 12 or cubesCounts["blue"] > 14 or cubesCounts["green"] > 13:
-                        print(f"Game {gameId} is invalid !")
-                        part1_KO = True
+                    if cubes_counts["red"] > 12 or cubes_counts["blue"] > 14 or cubes_counts["green"] > 13:
+                        print(f"Game {game_id} is invalid !")
+                        part1_ko = True
+                        continue
                 else:
                     for jet in jets:
-                        if int(jet[0]) > minCubeCounts[jet[1]]:
-                            minCubeCounts[jet[1]] = int(jet[0])
+                        if int(jet[0]) > min_cube_counts[jet[1]]:
+                            min_cube_counts[jet[1]] = int(jet[0])
 
-            if not part1_KO:
-                total_part1 += gameId
+            if not part1_ko:
+                total_part1 += game_id
 
-            total_part2 += minCubeCounts["red"] * minCubeCounts["blue"] * minCubeCounts["green"]
+            total_part2 += min_cube_counts["red"] * min_cube_counts["blue"] * min_cube_counts["green"]
 
         if part == 1:
             return total_part1
         else:
             return total_part2
+
 
 if __name__ == '__main__':
 
@@ -69,6 +67,5 @@ if __name__ == '__main__':
         result = process(level, "input.txt")
         print(f"Part {level} result is {result}")
 
-        PostAnswer(2023, level, result)
+        post_answer(2023, level, result)
         print(f"Part {level} result posted !")
-
