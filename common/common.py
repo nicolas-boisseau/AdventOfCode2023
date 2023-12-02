@@ -60,3 +60,7 @@ def PostAnswer(year, level, answer):
 def Capture(inputPattern, input):
     m = re.compile(inputPattern).match(input)
     return m.groups()
+
+def CaptureAll(inputPattern, input):
+    m = re.compile(inputPattern).findall(input)
+    return m
