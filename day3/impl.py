@@ -29,7 +29,7 @@ def process(part, filename):
                 if m[y][x].isdigit():
                     current_number += m[y][x]
                     is_near_symbol, symbol, symbol_position = check_is_near_symbol(is_near_symbol, m, x, y)
-                    if is_near_symbol and (symbol == "*" or (symbol != "" and symbol != ".")):
+                    if is_near_symbol and symbol != "" and symbol != ".":
                         current_symbol = {"symbol": symbol, "symbol_position": symbol_position}
                     previous_was_number = True
 
