@@ -64,39 +64,16 @@ def process(part, filename):
 def check_is_near_symbol(is_near_symbol, m, x, y):
     symbol = ""
     symbol_position = ""
-    if x + 1 < len(m[y]) and not m[y][x + 1].isdigit() and m[y][x + 1] != ".":
-        is_near_symbol = True
-        symbol = m[y][x + 1]
-        symbol_position = f"{y}_{x + 1}"
-    if y + 1 < len(m) and not m[y + 1][x].isdigit() and m[y + 1][x] != ".":
-        is_near_symbol = True
-        symbol = m[y + 1][x]
-        symbol_position = f"{y + 1}_{x}"
-    if x - 1 >= 0 and not m[y][x - 1].isdigit() and m[y][x - 1] != ".":
-        is_near_symbol = True
-        symbol = m[y][x - 1]
-        symbol_position = f"{y}_{x - 1}"
-    if y - 1 >= 0 and not m[y - 1][x].isdigit() and m[y - 1][x] != ".":
-        is_near_symbol = True
-        symbol = m[y - 1][x]
-        symbol_position = f"{y - 1}_{x}"
-    if x + 1 < len(m[y]) and y + 1 < len(m) and not m[y + 1][x + 1].isdigit() and m[y + 1][x + 1] != ".":
-        is_near_symbol = True
-        symbol = m[y + 1][x + 1]
-        symbol_position = f"{y + 1}_{x + 1}"
-    if x - 1 >= 0 and y + 1 < len(m) and not m[y + 1][x - 1].isdigit() and m[y + 1][x - 1] != ".":
-        is_near_symbol = True
-        symbol = m[y + 1][x - 1]
-        symbol_position = f"{y + 1}_{x - 1}"
-    if x + 1 < len(m[y]) and y - 1 >= 0 and not m[y - 1][x + 1].isdigit() and m[y - 1][x + 1] != ".":
-        is_near_symbol = True
-        symbol = m[y - 1][x + 1]
-        symbol_position = f"{y - 1}_{x + 1}"
-    if x - 1 >= 0 and y - 1 >= 0 and not m[y - 1][x - 1].isdigit() and m[y - 1][x - 1] != ".":
-        is_near_symbol = True
-        symbol = m[y - 1][x - 1]
-        symbol_position = f"{y - 1}_{x - 1}"
-
+    for i in range(-1, 2):
+        for j in range(-1, 2):
+            if i == 0 and j == 0:
+                continue
+            if x + j < 0 or x + j >= len(m[y]) or y + i < 0 or y + i >= len(m):
+                continue
+            if not m[y + i][x + j].isdigit() and m[y + i][x + j] != ".":
+                is_near_symbol = True
+                symbol = m[y + i][x + j]
+                symbol_position = f"{y + i}_{x + j}"
     return is_near_symbol, symbol, symbol_position
 
 
