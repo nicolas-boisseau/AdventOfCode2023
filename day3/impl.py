@@ -29,7 +29,7 @@ def process(part, filename):
                 if m[y][x].isdigit():
                     current_number += m[y][x]
                     is_near_symbol, symbol, symbol_position = check_is_near_symbol(is_near_symbol, m, x, y)
-                    if is_near_symbol and symbol != "" and symbol != ".":
+                    if is_near_symbol and (symbol == "*" or (symbol != "" and symbol != ".")):
                         current_symbol = {"symbol": symbol, "symbol_position": symbol_position}
                     previous_was_number = True
 
@@ -46,12 +46,14 @@ def process(part, filename):
                             else:
                                 gear_count_by_position[symbol_position]["score"] += int(current_number)
                             gear_count_by_position[symbol_position]["count"] += 1
-                            if gear_count_by_position[symbol_position]["count"] >= 2:
-                                total_part2 += gear_count_by_position[symbol_position]["score"]
+
                     current_number = ""
                     is_near_symbol = False
                     previous_was_number = False
 
+        for gear_count in gear_count_by_position.values():
+            if gear_count["count"] == 2:
+                total_part2 += gear_count["score"]
 
         if part == 1:
             return total_part1
@@ -65,35 +67,35 @@ def check_is_near_symbol(is_near_symbol, m, x, y):
     if x + 1 < len(m[y]) and not m[y][x + 1].isdigit() and m[y][x + 1] != ".":
         is_near_symbol = True
         symbol = m[y][x + 1]
-        symbol_position = f"{y}{x + 1}"
+        symbol_position = f"{y}_{x + 1}"
     if y + 1 < len(m) and not m[y + 1][x].isdigit() and m[y + 1][x] != ".":
         is_near_symbol = True
         symbol = m[y + 1][x]
-        symbol_position = f"{y + 1}{x}"
+        symbol_position = f"{y + 1}_{x}"
     if x - 1 >= 0 and not m[y][x - 1].isdigit() and m[y][x - 1] != ".":
         is_near_symbol = True
         symbol = m[y][x - 1]
-        symbol_position = f"{y}{x - 1}"
+        symbol_position = f"{y}_{x - 1}"
     if y - 1 >= 0 and not m[y - 1][x].isdigit() and m[y - 1][x] != ".":
         is_near_symbol = True
         symbol = m[y - 1][x]
-        symbol_position = f"{y - 1}{x}"
+        symbol_position = f"{y - 1}_{x}"
     if x + 1 < len(m[y]) and y + 1 < len(m) and not m[y + 1][x + 1].isdigit() and m[y + 1][x + 1] != ".":
         is_near_symbol = True
         symbol = m[y + 1][x + 1]
-        symbol_position = f"{y + 1}{x + 1}"
+        symbol_position = f"{y + 1}_{x + 1}"
     if x - 1 >= 0 and y + 1 < len(m) and not m[y + 1][x - 1].isdigit() and m[y + 1][x - 1] != ".":
         is_near_symbol = True
         symbol = m[y + 1][x - 1]
-        symbol_position = f"{y + 1}{x - 1}"
+        symbol_position = f"{y + 1}_{x - 1}"
     if x + 1 < len(m[y]) and y - 1 >= 0 and not m[y - 1][x + 1].isdigit() and m[y - 1][x + 1] != ".":
         is_near_symbol = True
         symbol = m[y - 1][x + 1]
-        symbol_position = f"{y - 1}{x + 1}"
+        symbol_position = f"{y - 1}_{x + 1}"
     if x - 1 >= 0 and y - 1 >= 0 and not m[y - 1][x - 1].isdigit() and m[y - 1][x - 1] != ".":
         is_near_symbol = True
         symbol = m[y - 1][x - 1]
-        symbol_position = f"{y - 1}{x - 1}"
+        symbol_position = f"{y - 1}_{x - 1}"
 
     return is_near_symbol, symbol, symbol_position
 
