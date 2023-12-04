@@ -59,10 +59,7 @@ def process(part, filename):
                 score, nb_won_numbers = card.get_score()
                 if nb_won_numbers == 0:
                     continue
-                if part == 1:
-                    total_part1 += score
-                else:
-                    total_part2 += score
+                total_part1 += score
         else:
             nb_cards_by_id = {}
             for card in cards:
