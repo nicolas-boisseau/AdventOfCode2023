@@ -18,6 +18,11 @@ class MapperRule:
             return -1
         return self.destination_start + (sourceNumber - self.source_start)
 
+    def reverse_map(self, destination_number):
+        if destination_number < self.destination_start or destination_number >= self.destination_start + self.range:
+            return -1
+        return self.source_start + (destination_number - self.destination_start)
+
     def __str__(self):
         return str(self.map)
 
@@ -37,6 +42,13 @@ class Mapper:
                 return mapped
         return sourceNumber
 
+    def reverse_map(self, destination_number):
+        for rule in self.rules:
+            mapped = rule.reverse_map(destination_number)
+            if mapped != -1:
+                return mapped
+        return destination_number
+
     def __str__(self):
         return str(self.map)
 
@@ -55,6 +67,11 @@ class Pipeline:
     def __str__(self):
         return str(self.map)
 
+    def reverse_map(self, destination_number):
+        for mapper in reversed(self.mappers):
+            destination_number = mapper.reverse_map(destination_number)
+        return destination_number
+
 def process(part, filename):
     if not (os.path.exists(filename)):
         print("Input file not found !")
@@ -67,15 +84,14 @@ def process(part, filename):
         lines = [line.replace("\n", "") for line in f.readlines()]
 
         seeds = []
+        seeds_ranges = []
         seedsRaw = capture_all(r"(\d+)", lines[0].split(": ")[1])
         if part == 1:
             seeds = [int(n) for n in seedsRaw]
         else:
             seed_pairs = [int(n) for n in seedsRaw]
             for i in range(0, len(seed_pairs), 2):
-                for j in range(seed_pairs[i], seed_pairs[i] + seed_pairs[i+1]):
-                    seeds.append(j)
-            # TOO HEAVY
+                seeds_ranges.append({"start": seed_pairs[i], "end": seed_pairs[i] + seed_pairs[i+1] })
 
         pipeline = Pipeline()
         current_mapper = None
@@ -92,13 +108,25 @@ def process(part, filename):
                 rule = capture(r"(\d+) (\d+) (\d+)", line)
                 current_mapper.add_rule(int(rule[0]), int(rule[1]), int(rule[2]))
 
-        converted = []
-        for seed in seeds:
-            converted.append(pipeline.map(seed))
+        if part == 1:
+            converted = []
+            for seed in seeds:
+                converted.append(pipeline.map(seed))
 
-        #converted = [pipeline.map(seed) for seed in seeds]
+            #converted = [pipeline.map(seed) for seed in seeds]
 
-        return min(converted)
+            return min(converted)
+        else:
+            for i in range(26000000, 26829170, 1):
+                test = pipeline.reverse_map(i)
+                if isInRange(test, seeds_ranges):
+                    return i
+
+def isInRange(number, ranges):
+    for range in ranges:
+        if range["start"] <= number < range["end"]:
+            return True
+    return False
 
 if __name__ == '__main__':
 
@@ -112,5 +140,8 @@ if __name__ == '__main__':
         result = process(level, "input.txt")
         print(f"Part {level} result is {result}")
 
-        post_answer(2023, level, result)
-        print(f"Part {level} result posted !")
+        if result is not None:
+            post_answer(2023, level, result)
+            print(f"Part {level} result posted !")
+        else:
+            print("Result is None...")

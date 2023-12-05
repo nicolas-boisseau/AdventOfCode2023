@@ -1,5 +1,5 @@
 import unittest
-from impl import process
+from impl_part2 import process
 
 
 class AdventOfCodeTests(unittest.TestCase):
@@ -14,7 +14,7 @@ class AdventOfCodeTests(unittest.TestCase):
         self.assertEqual(process(2, "sample.txt"), 46)
 
     def test_part2_input(self):
-        self.assertEqual(process(2, "input.txt"), 2508)
+        self.assertEqual(process(2, "input.txt"), 26829166)
 
 
 if __name__ == '__main__':
