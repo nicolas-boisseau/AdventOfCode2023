@@ -79,17 +79,23 @@ class Hand:
 
     def lt_compare_hands(self, other):
         for i, card in enumerate(self.cards):
-            if card.strength() < other.cards[i].strength():
+            if self.cards[i].strength() == other.cards[i].strength():
+                continue
+            elif self.cards[i].strength() < other.cards[i].strength():
                 return True
+            else:
+                return False
         return False
 
     def __lt__(self, other):
-        if self.kind() == other.kind():
-            return self.lt_compare_hands(other)
+        selfKind, selfStrength = self.kind()
+        otherKind, otherStrength = other.kind()
+        print(f"{selfKind}={selfStrength} VS {otherKind}={otherStrength}")
+        if selfKind == otherKind and selfKind != "nawak" and otherKind != "nawak":
+            res = self.lt_compare_hands(other)
+            print(f"{res}")
+            return res
         else:
-            selfKind, selfStrength = self.kind()
-            otherKind, otherStrength = other.kind()
-            print(f"{selfKind}={selfStrength} VS {otherKind}={otherStrength}")
             if selfStrength != -1 and otherStrength == -1:
                 print("False")
                 return False

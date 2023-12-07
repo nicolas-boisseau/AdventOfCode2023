@@ -11,7 +11,7 @@ class AdventOfCodeTests(unittest.TestCase):
         #self.assertEqual(process(1, "input.txt"), 1804)
         res = process(1, "input.txt")
         print(res)
-        self.assertTrue(res < 246228485)
+        self.assertTrue(res > 246228485)
 
     def test_part2_sample(self):
         self.assertEqual(process(2, "sample.txt"), 19)
