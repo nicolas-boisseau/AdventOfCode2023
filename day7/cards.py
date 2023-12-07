@@ -61,20 +61,21 @@ class Hand:
         return Enumerable(self.cards).group_by(key=lambda card: card.label).count(lambda group: len(group) == 1) == 5
 
     def kind(self):
-        strength = 0
         if self.is_five_of_a_kind():
-            return "five_of_a_kind", 6
+            return "five_of_a_kind", 7
         elif self.is_four_of_a_kind():
-            return "four_of_a_kind", 5
+            return "four_of_a_kind", 6
         elif self.is_full_house():
-            return "full_house", 4
+            return "full_house", 5
         elif self.is_three_of_a_kind():
-            return "three_of_a_kind", 3
+            return "three_of_a_kind", 4
         elif self.is_double_pair():
-            return "double_pair", 2
+            return "double_pair", 3
         elif self.is_pair():
-            return "pair", 1
-        return "high_card", strength
+            return "pair", 2
+        elif self.is_high_card():
+            return "high_card", 1
+        return "nawak", -1
 
     def lt_compare_hands(self, other):
         for i, card in enumerate(self.cards):
@@ -88,8 +89,19 @@ class Hand:
         else:
             selfKind, selfStrength = self.kind()
             otherKind, otherStrength = other.kind()
-            if otherStrength > selfStrength:
+            print(f"{selfKind}={selfStrength} VS {otherKind}={otherStrength}")
+            if selfStrength != -1 and otherStrength == -1:
+                print("False")
+                return False
+            elif selfStrength == -1 and otherStrength != -1:
+                print("True")
                 return True
+            elif selfStrength < otherStrength :
+                print("True")
+                return True
+            else:
+                print("False")
+                return False
 
         return False
 
@@ -110,6 +122,6 @@ class Game:
         for i in range(len(self.hands)-1, -1, -1):
             hand = self.hands[i].to_string()
             hand_score = self.hands[i].bid * (i + 1)
-            print(f"{hand} : bid={self.hands[i].bid} and score= {hand_score}")
+            #print(f"{hand} : bid={self.hands[i].bid} and score= {hand_score}")
             score += self.hands[i].bid * (i + 1)
         return score
