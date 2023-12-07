@@ -32,6 +32,11 @@ class CardsTests(unittest.TestCase):
     def test_compare(self):
         self.assertTrue(Hand("KTJJT") < Hand("KK677"))
 
+    def test_joker_mutations(self):
+        hand = Hand("AAKKJ")
+        mutations = [h for h in hand.get_mutations_with_joker()]
+        self.assertEqual(len(mutations), 12)
+
 
 if __name__ == '__main__':
     unittest.main()

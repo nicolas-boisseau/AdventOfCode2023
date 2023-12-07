@@ -13,15 +13,13 @@ def process(part, filename):
 
     print("Input file OK ! Starting processing...")
 
-    total_part1 = 0
-    total_part2 = 0
     with open(filename) as f:
         lines = [line.replace("\n", "") for line in f.readlines()]
 
-        g = Game()
+        g = Game(part == 2)
         for line in lines:
             split = line.split(" ")
-            h = Hand(split[0], int(split[1]))
+            h = Hand(split[0], int(split[1]), part == 2)
 
             g.add_hand(h)
 

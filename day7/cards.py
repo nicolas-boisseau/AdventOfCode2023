@@ -17,21 +17,25 @@ card_strengths = {
 }
 
 class Card:
-    def __init__(self, label):
+    def __init__(self, label, use_joker=False):
         self.label = label
+        self.card_strengths = card_strengths
+        if use_joker:
+            self.card_strengths['J'] = 1
 
     def __str__(self):
         return self.label
 
     def strength(self):
-        return card_strengths[self.label]
+        return self.card_strengths[self.label]
 
     def __lt__(self, other):
         return self.strength() < other.strength()
 class Hand:
-    def __init__(self, cards, bid=0):
-        self.cards = [Card(card) for card in cards]
+    def __init__(self, cards, bid=0, use_joker=False):
+        self.cards = [Card(card, use_joker) for card in cards]
         self.bid = bid
+        self.use_joker = use_joker
 
     def to_string(self):
         res = ""
@@ -77,6 +81,15 @@ class Hand:
             return "high_card", 1
         return "nawak", -1
 
+    def kind_using_joker(self):
+        if self.use_joker and 'J' in self.to_string():
+            all_possibles_hands = [h for h in self.get_mutations_with_joker()]
+            all_possibles_hands.sort()
+            if len(all_possibles_hands) == 0:
+                return self.kind()
+            return all_possibles_hands[len(all_possibles_hands)-1].kind()
+        return self.kind()
+
     def lt_compare_hands(self, other):
         for i, card in enumerate(self.cards):
             if self.cards[i].strength() == other.cards[i].strength():
@@ -87,33 +100,47 @@ class Hand:
                 return False
         return False
 
+    def get_mutations_with_joker(self):
+        if 'J' in self.to_string():
+            for c in card_strengths.keys():
+                if c == 'J' or c not in self.to_string():
+                    continue
+                yield Hand(self.to_string().replace('J', c), self.bid)
+
+
+
     def __lt__(self, other):
         selfKind, selfStrength = self.kind()
+        selfKindJ, selfJStrength = self.kind_using_joker()
+        if selfJStrength > selfStrength:
+            selfKind = selfKindJ
+            selfStrength = selfJStrength
         otherKind, otherStrength = other.kind()
-        print(f"{selfKind}={selfStrength} VS {otherKind}={otherStrength}")
+        otherKindJ, otherJStrength = other.kind_using_joker()
+        if otherJStrength > otherStrength:
+            otherKind = otherKindJ
+            otherStrength = otherJStrength
+        #print(f"{selfKind}={selfStrength} VS {otherKind}={otherStrength}")
         if selfKind == otherKind and selfKind != "nawak" and otherKind != "nawak":
             res = self.lt_compare_hands(other)
-            print(f"{res}")
+           #print(f"{res}")
             return res
         else:
             if selfStrength != -1 and otherStrength == -1:
-                print("False")
                 return False
             elif selfStrength == -1 and otherStrength != -1:
-                print("True")
                 return True
             elif selfStrength < otherStrength :
-                print("True")
                 return True
             else:
-                print("False")
                 return False
 
         return False
 
 class Game:
-    def __init__(self):
+    def __init__(self, use_joker=False):
         self.hands = []
+        self.use_joker = use_joker
 
     def __str__(self):
         return str(self.hands)
