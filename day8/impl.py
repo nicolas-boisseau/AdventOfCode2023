@@ -74,11 +74,24 @@ def process(part, filename):
 
             patterns = [tracking[node]["z_pos"][1] - tracking[node]["z_pos"][0] for node in tracking.keys() if len(tracking[node]["z_pos"]) >= 2]
 
-            next = patterns[0]
-            while Enumerable(patterns).any(lambda p: next % p != 0):
-                next += patterns[0]
+            n2 = compute_lcm(patterns[0], patterns[1])
+            n3 = compute_lcm(n2, patterns[2])
+            n4 = compute_lcm(n3, patterns[3])
+            n5 = compute_lcm(n4, patterns[4])
+            n6 = compute_lcm(n5, patterns[5])
 
-            return next
+            return n6
+
+def compute_lcm(a, b):
+
+   return a / gcd(a,b) * b
+
+def gcd(a, b):
+    while b != 0:
+        t = b
+        b = a % b
+        a = t
+    return a
 
 if __name__ == '__main__':
 
