@@ -74,11 +74,11 @@ def process(part, filename):
 
             patterns = [tracking[node]["z_pos"][1] - tracking[node]["z_pos"][0] for node in tracking.keys() if len(tracking[node]["z_pos"]) >= 2]
 
-            res = 1
-            for p in patterns:
-                res *= p
+            next = patterns[0]
+            while Enumerable(patterns).any(lambda p: next % p != 0):
+                next += patterns[0]
 
-            return res
+            return next
 
 if __name__ == '__main__':
 
