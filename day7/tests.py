@@ -16,6 +16,7 @@ class AdventOfCodeTests(unittest.TestCase):
 
     def test_part2_input(self):
         self.assertEqual(process(2, "input.txt"), 248256639)
+        #20216105529489301725275989 => too high
 
 
 if __name__ == '__main__':

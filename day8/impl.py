@@ -1,4 +1,7 @@
 import os.path
+from collections import defaultdict
+
+from py_linq import Enumerable
 
 from common.common import download_input_if_not_exists, post_answer, capture, capture_all
 
@@ -11,21 +14,76 @@ def process(part, filename):
 
     print("Input file OK ! Starting processing...")
 
-    total_part1 = 0
-    total_part2 = 0
     with open(filename) as f:
         lines = [line.replace("\n", "") for line in f.readlines()]
 
-        # TODO
+        instructions = lines[0]
+
+        phases = {}
+        i = 0
+        for line in lines[2:]:
+            nodes = capture_all(r"([0-9A-Z]{3})", line)
+            phases[nodes[0]] = (nodes[1], nodes[2])
+
         if part == 1:
-            return total_part1
+            currentNodeName = "AAA"
+            i = 0
+            total_steps = 0
+            while currentNodeName != "ZZZ":
+                next_instruction = instructions[i]
+                if next_instruction == "R":
+                    currentNodeName = phases[currentNodeName][1]
+                else:
+                    currentNodeName = phases[currentNodeName][0]
+                i = (i + 1) % len(instructions)
+                total_steps += 1
+
+            return total_steps
         else:
-            return total_part2
+            current_nodes = Enumerable(phases.keys()).where(lambda k: k.endswith("A")).select(lambda k: k).to_list()
+            print(current_nodes)
+
+            tracking = {}
+            for n in current_nodes:
+                tracking[n] = {
+                    "starting_node": n,
+                    "current_node": n,
+                    "z_pos": []
+                }
+
+            total_steps = 0
+            i = 0
+            while not Enumerable(tracking.keys()).all(lambda k: tracking[k]["current_node"].endswith("Z")) and total_steps < 100000:
+                total_steps += 1
+                next_instruction = instructions[i]
+                if next_instruction == "R":
+                    for j, node in enumerate(tracking.keys()):
+                        tracking[node]["current_node"] = phases[tracking[node]["current_node"]][1]
+                        if tracking[node]["current_node"].endswith("Z"):
+                            tracking[node]["z_pos"].append(total_steps)
+                            #print(f"for node {j} a Z node has been found : {current_nodes[j]} at step {total_steps}")
+                else:
+                    for j, node in enumerate(tracking.keys()):
+                        tracking[node]["current_node"] = phases[tracking[node]["current_node"]][0]
+                        if tracking[node]["current_node"].endswith("Z"):
+                            tracking[node]["z_pos"].append(total_steps)
+                            #print(f"for node {j} a Z node has been found : {current_nodes[j]} at step {total_steps}")
+                i = (i + 1) % len(instructions)
+
+            print(tracking)
+
+            patterns = [tracking[node]["z_pos"][1] - tracking[node]["z_pos"][0] for node in tracking.keys() if len(tracking[node]["z_pos"]) >= 2]
+
+            res = 1
+            for p in patterns:
+                res *= p
+
+            return res
 
 if __name__ == '__main__':
 
-    level = 1
-    expectedSampleResult = -1
+    level = 2
+    expectedSampleResult = 6
     sampleFile = "sample.txt"
 
     if process(level, sampleFile) == expectedSampleResult:
