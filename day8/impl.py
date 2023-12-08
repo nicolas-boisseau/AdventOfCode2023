@@ -1,5 +1,6 @@
 import os.path
 from collections import defaultdict
+from functools import reduce
 
 from py_linq import Enumerable
 
@@ -74,11 +75,12 @@ def process(part, filename):
 
             patterns = [tracking[node]["z_pos"][1] - tracking[node]["z_pos"][0] for node in tracking.keys() if len(tracking[node]["z_pos"]) >= 2]
 
-            result = compute_lcm(patterns[0], patterns[1])
-            for i in range(2, len(patterns)):
-                result = compute_lcm(result, patterns[i])
-
-            return result
+            # result = compute_lcm(patterns[0], patterns[1])
+            # for i in range(2, len(patterns)):
+            #     result = compute_lcm(result, patterns[i])
+            #
+            # return result
+            return reduce(compute_lcm, patterns)
 
 def compute_lcm(a, b):
 
