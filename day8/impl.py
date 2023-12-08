@@ -74,13 +74,11 @@ def process(part, filename):
 
             patterns = [tracking[node]["z_pos"][1] - tracking[node]["z_pos"][0] for node in tracking.keys() if len(tracking[node]["z_pos"]) >= 2]
 
-            n2 = compute_lcm(patterns[0], patterns[1])
-            n3 = compute_lcm(n2, patterns[2])
-            n4 = compute_lcm(n3, patterns[3])
-            n5 = compute_lcm(n4, patterns[4])
-            n6 = compute_lcm(n5, patterns[5])
+            result = compute_lcm(patterns[0], patterns[1])
+            for i in range(2, len(patterns)):
+                result = compute_lcm(result, patterns[i])
 
-            return n6
+            return result
 
 def compute_lcm(a, b):
 
