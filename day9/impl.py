@@ -21,7 +21,7 @@ class Suit:
         for i in range(1, len(current_sequence), 1):
             new_sequence.append(current_sequence[i] - current_sequence[i-1])
         self.all_sequences.append(new_sequence)
-        print(new_sequence)
+        #print(new_sequence)
 
     def is_last_sequence(self):
         return Enumerable(self.all_sequences[-1]).all(lambda n: n == 0)
@@ -30,18 +30,12 @@ class Suit:
         if not self.is_last_sequence():
             print("should compute diffs first !")
             return
-        if len(self.all_sequences) <= 1:
-            print("should compute diffs first !")
-            return
         for i in range(len(self.all_sequences) - 2, -1, -1):
             self.all_sequences[i].append(self.all_sequences[i][-1] + self.all_sequences[i+1][-1])
         return self.all_sequences[0][-1]
 
     def compute_previous_value(self):
         if not self.is_last_sequence():
-            print("should compute diffs first !")
-            return
-        if len(self.all_sequences) <= 1:
             print("should compute diffs first !")
             return
         for i in range(len(self.all_sequences) - 2, -1, -1):
