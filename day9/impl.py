@@ -6,11 +6,15 @@ from common.common import download_input_if_not_exists, post_answer, capture, ca
 
 download_input_if_not_exists(2023)
 
-class Suit:
+class NumSequence:
     def __init__(self, initial_sequence):
         self.initial_sequence = initial_sequence
         self.all_sequences = []
         self.all_sequences.append(initial_sequence)
+
+    def compute_all_diffs(self):
+        while not self.is_last_sequence():
+            self.compute_next_diff()
 
     def compute_next_diff(self):
         if self.is_last_sequence():
@@ -52,27 +56,17 @@ def process(part, filename):
     with open(filename) as f:
         lines = [line.replace("\n", "") for line in f.readlines()]
 
-        suits = []
+        sequences = []
         for line in lines:
-            suit = [int(n) for n in capture_all(r"([0-9-]+)", line)]
-            suits.append(Suit(suit))
+            s = [int(n) for n in capture_all(r"([0-9-]+)", line)]
+            new_sequence = NumSequence(s)
+            new_sequence.compute_all_diffs()
+            sequences.append(new_sequence)
 
-        while not Enumerable(suits).all(lambda s: s.is_last_sequence()):
-            for suit in suits:
-                if not suit.is_last_sequence():
-                    suit.compute_next_diff()
-
-        total = 0
         if part == 1:
-            for suit in suits:
-                nextValue = suit.compute_next_value()
-                total += nextValue
+            return sum([s.compute_next_value() for s in sequences])
         else:
-            for suit in suits:
-                nextValue = suit.compute_previous_value()
-                total += nextValue
-
-        return total
+            return sum([s.compute_previous_value() for s in sequences])
 
 
 if __name__ == '__main__':
