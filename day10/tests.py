@@ -26,8 +26,7 @@ class AdventOfCodeTests(unittest.TestCase):
         self.assertEqual(process(2, "sample6.txt"), 10)
 
     def test_part2_input(self):
-        self.assertTrue(process(2, "input.txt") > 299)
-        #self.assertEqual(process(2, "input.txt"), 2508)
+        self.assertEqual(process(2, "input.txt"), 303)
 
 
 if __name__ == '__main__':

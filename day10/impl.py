@@ -5,22 +5,6 @@ from common.common import download_input_if_not_exists, post_answer, capture, ca
 
 download_input_if_not_exists(2023)
 
-
-# https://stackoverflow.com/questions/29320556/finding-longest-path-in-a-graph
-def DFS(G,v,seen=None,path=None):
-    if seen is None: seen = []
-    if path is None: path = [v]
-
-    seen.append(v)
-
-    paths = []
-    for t in G[v]:
-        if t not in seen:
-            t_path = path + [t]
-            paths.append(tuple(t_path))
-            paths.extend(DFS(G, t, seen[:], t_path))
-    return paths
-
 def DFS2(g, source):
   s = []
   visited = set([])
@@ -138,28 +122,32 @@ def process(part, filename):
                         to_look.append((1, -1))
                     elif lines[y][x] == "L" and direction_x == 1 and direction_y == 0:
                         to_look.append((0, 1))
+                        to_look.append((-1, 0))
+                        to_look.append((-1, 1))
                     elif lines[y][x] == "J" and direction_x == -1 and direction_y == 0:
                         to_look.append((-1, -1))
                     elif lines[y][x] == "J" and direction_x == 0 and direction_y == -1:
                         to_look.append((1, 0))
+                        to_look.append((0, -1))
+                        to_look.append((1, 0))
                     elif lines[y][x] == "7" and direction_x == -1 and direction_y == 0:
                         to_look.append((0, -1))
+                        to_look.append((1, 0))
+                        to_look.append((1, -1))
                     elif lines[y][x] == "7" and direction_x == 0 and direction_y == 1:
                         to_look.append((-1, 1))
                     elif lines[y][x] == "F" and direction_x == 1 and direction_y == 0:
                         to_look.append((1, 1))
                     elif lines[y][x] == "F" and direction_x == 0 and direction_y == 1:
                         to_look.append((-1, 0))
+                        to_look.append((0, -1))
+                        to_look.append((-1, -1))
                     elif lines[y][x] == "S":
                         if direction_y == 0 and direction_x == 1:  # moving right
                             to_look.append((0, 1))
                         elif direction_y == 0 and direction_x == -1:  # moving left
-                            look_at_y = -1
-                            look_at_x = 0
                             to_look.append((0, -1))
                         elif direction_y == 1 and direction_x == 0:  # moving down
-                            look_at_y = 0
-                            look_at_x = -1
                             to_look.append((-1, 0))
                         elif direction_y == -1 and direction_x == 0:  # moving up
                             to_look.append((1, 0))
@@ -174,7 +162,7 @@ def process(part, filename):
                         if to_look not in seen and in_bounds(x+look_at_x, y+look_at_y) and lines[y+look_at_y][x+look_at_x] == ".":
                             seen = propagate_tiles_non_recursive(lines, seen, x+look_at_x, y+look_at_y)
 
-                print_with_current_position(lines, seen, x, y, path)
+                #print_with_current_position(lines, seen, x, y, path)
                 results.append(len(seen))
 
             print(results)
