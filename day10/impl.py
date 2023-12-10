@@ -82,20 +82,11 @@ def process(part, filename):
                         add_if_in_bounds(node, x+1, y)
                     s = node
 
-        # all_paths = DFS(g, s)
-        # for p in all_paths:
-        #     print(p)
-        #
-        # return max([len(p) for p in all_paths]) / 2
 
-        print(DFS2(g, s))
+        #print(DFS2(g, s))
 
         return int(len(DFS2(g, s)) / 2)
 
-
-def next(g, s):
-    for next in g[s]:
-        print(f"next = {next}")
 
 
 
