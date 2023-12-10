@@ -102,51 +102,79 @@ def process(part, filename):
                     else:
                         newLine += char
                 lines[y] = newLine
+            #print_with_current_position(lines, seen, 0, 0, origin_path)
 
             paths = []
             paths.append(origin_path)
             path_rev = origin_path.copy()
             path_rev.reverse()
-            #paths.append(path_rev)
+            paths.append(path_rev)
             results = []
 
 
             for path in paths:
                 seen = set([])
 
-                path_so_far = []
                 for i in range (0, len(path), 1):
                     captured = capture("([0-9]+)_([0-9]+)", path[i])
                     x, y = int(captured[1]), int(captured[0])
-                    path_so_far.append(f"{y}_{x}")
-                    print_with_current_position(lines, seen, x, y, path_so_far)
 
-                    captured = capture("([0-9]+)_([0-9]+)", path[(i-1)])
-                    prev_x, prev_y = int(captured[1]), int(captured[0])
-                    direction_x = x - prev_x
-                    direction_y = y - prev_y
-                    look_at_x = 0
-                    look_at_y = 0
-                    if direction_y == 0 and direction_x == 1: # moving right
-                        look_at_y = 1
-                        look_at_x = 0
-                    elif direction_y == 0 and direction_x == -1: # moving left
-                        look_at_y = -1
-                        look_at_x = 0
-                    elif direction_y == 1 and direction_x == 0: # moving down
-                        look_at_y = 0
-                        look_at_x = -1
-                    elif direction_y == -1 and direction_x == 0: # moving up
-                        look_at_y = 0
-                        look_at_x = 1
+                    captured = capture("([0-9]+)_([0-9]+)", path[(i + 1) % len(path)])
+                    next_x, next_y = int(captured[1]), int(captured[0])
+                    direction_x = next_x - x
+                    direction_y = next_y - y
+
+                    to_look = []
+
+                    if lines[y][x] == "|" and direction_y == -1:
+                        to_look.append((1, 0))
+                    elif lines[y][x] == "|" and direction_y == 1:
+                        to_look.append((-1, 0))
+                    elif lines[y][x] == "-" and direction_x == -1:
+                        to_look.append((0, -1))
+                    elif lines[y][x] == "-" and direction_x == 1:
+                        to_look.append((0, 1))
+                    elif lines[y][x] == "L" and direction_x == 0 and direction_y == -1:
+                        to_look.append((1, -1))
+                    elif lines[y][x] == "L" and direction_x == 1 and direction_y == 0:
+                        to_look.append((0, 1))
+                    elif lines[y][x] == "J" and direction_x == -1 and direction_y == 0:
+                        to_look.append((-1, -1))
+                    elif lines[y][x] == "J" and direction_x == 0 and direction_y == -1:
+                        to_look.append((1, 0))
+                    elif lines[y][x] == "7" and direction_x == -1 and direction_y == 0:
+                        to_look.append((0, -1))
+                    elif lines[y][x] == "7" and direction_x == 0 and direction_y == 1:
+                        to_look.append((-1, 1))
+                    elif lines[y][x] == "F" and direction_x == 1 and direction_y == 0:
+                        to_look.append((1, 1))
+                    elif lines[y][x] == "F" and direction_x == 0 and direction_y == 1:
+                        to_look.append((-1, 0))
+                    elif lines[y][x] == "S":
+                        if direction_y == 0 and direction_x == 1:  # moving right
+                            to_look.append((0, 1))
+                        elif direction_y == 0 and direction_x == -1:  # moving left
+                            look_at_y = -1
+                            look_at_x = 0
+                            to_look.append((0, -1))
+                        elif direction_y == 1 and direction_x == 0:  # moving down
+                            look_at_y = 0
+                            look_at_x = -1
+                            to_look.append((-1, 0))
+                        elif direction_y == -1 and direction_x == 0:  # moving up
+                            to_look.append((1, 0))
+                        #pass
+                    else:
+                        print("ERROR !")
+                        return
 
                     # look at right neighbour only
-                    to_look = f"{y+look_at_y}_{x+look_at_x}"
-                    if to_look not in seen and in_bounds(x+look_at_x, y+look_at_y) and lines[y+look_at_y][x+look_at_x] == ".":
-                        seen = propagate_tiles_non_recursive(lines, seen, x+look_at_x, y+look_at_y)
+                    for look_at_x, look_at_y in to_look:
+                        to_look = f"{y+look_at_y}_{x+look_at_x}"
+                        if to_look not in seen and in_bounds(x+look_at_x, y+look_at_y) and lines[y+look_at_y][x+look_at_x] == ".":
+                            seen = propagate_tiles_non_recursive(lines, seen, x+look_at_x, y+look_at_y)
 
                 print_with_current_position(lines, seen, x, y, path)
-                print(len(lines)*len(lines[0]) - len(seen) - len(path))
                 results.append(len(seen))
 
             print(results)
@@ -163,9 +191,9 @@ def propagate_tiles_non_recursive(lines, seen, x, y):
         return
     if f"{y}_{x}" in seen:
         return
-    seen.add(f"{y}_{x}")
     if lines[y][x] != ".":
         return
+    seen.add(f"{y}_{x}")
 
     to_propagate = []
     to_propagate.append((y, x))
@@ -182,26 +210,6 @@ def propagate_tiles_non_recursive(lines, seen, x, y):
         seen.add(f"{cur_y}_{cur_x}")
     return seen
 
-def propagate_all_tiles(lines, seen, x, y):
-
-    #print(f"propagating {x}, {y}")
-    if not (0 <= x < len(lines[0]) and 0 <= y < len(lines)):
-        return
-    if f"{y}_{x}" in seen:
-        return
-    seen.add(f"{y}_{x}")
-    if lines[y][x] != ".":
-        return
-
-    if f"{y}_{x-1}" not in seen:
-        propagate_all_tiles(lines, seen, x-1, y)
-    if f"{y}_{x+1}" not in seen:
-        propagate_all_tiles(lines, seen, x+1, y)
-    if f"{y-1}_{x}" not in seen:
-        propagate_all_tiles(lines, seen, x, y-1)
-    if f"{y+1}_{x}" not in seen:
-        propagate_all_tiles(lines, seen, x, y+1)
-    return seen
 
 def print_with_current_position(lines, seen, x, y, path):
     for yy, line in enumerate(lines):
