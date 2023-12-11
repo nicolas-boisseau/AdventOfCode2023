@@ -71,21 +71,21 @@ def process(part, filename, expand=1):
         galaxies = findGalaxiesPositions(lines)
         print(f"nb galaxies: {len(galaxies)}")
 
-        nodes = {}
-        for y, line in enumerate(lines):
-            for x, char in enumerate(line):
-                node_key = f"{x},{y}"
-                nodes[node_key] = []
-                if x > 0:
-                    nodes[node_key].append((f"{x-1},{y}", 1))
-                if y > 0:
-                    nodes[node_key].append((f"{x},{y-1}", 1))
-                if x < len(line)-1:
-                    nodes[node_key].append((f"{x+1},{y}", 1))
-                if y < len(lines)-1:
-                    nodes[node_key].append((f"{x},{y+1}", 1))
+        # nodes = {}
+        # for y, line in enumerate(lines):
+        #     for x, char in enumerate(line):
+        #         node_key = f"{x},{y}"
+        #         nodes[node_key] = []
+        #         if x > 0:
+        #             nodes[node_key].append((f"{x-1},{y}", 1))
+        #         if y > 0:
+        #             nodes[node_key].append((f"{x},{y-1}", 1))
+        #         if x < len(line)-1:
+        #             nodes[node_key].append((f"{x+1},{y}", 1))
+        #         if y < len(lines)-1:
+        #             nodes[node_key].append((f"{x},{y+1}", 1))
 
-        astar = BasicAStar(nodes)
+        #astar = BasicAStar(nodes)
 
         pairs = {}
         for i_g in range(0, len(galaxies)):
