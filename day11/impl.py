@@ -1,3 +1,4 @@
+import math
 import os.path
 
 from py_linq import Enumerable
@@ -81,12 +82,27 @@ def process(part, filename):
         astar = BasicAStar(nodes)
 
         pairs = {}
-        for i_g, galaxy in enumerate(galaxies):
-            for j_g, other_galaxy in enumerate(galaxies):
+        for i_g in range(0, len(galaxies)):
+            for j_g in range(i_g+1, len(galaxies)):
+                galaxy = galaxies[i_g]
+                other_galaxy = galaxies[j_g]
                 if i_g != j_g and ((galaxy[0], other_galaxy[0]) not in pairs) and ((other_galaxy[0], galaxy[0]) not in pairs):
-                    path = astar.astar(f"{galaxy[1][0]},{galaxy[1][1]}", f"{other_galaxy[1][0]},{other_galaxy[1][1]}")
-                    path = list(path)
-                    pairs[(galaxy[0], other_galaxy[0])] = len(path)-1
+
+                    if galaxy[1][0] == other_galaxy[1][0]:
+                        pairs[(galaxy[0], other_galaxy[0])] = abs(galaxy[1][1] - other_galaxy[1][1])
+                    elif galaxy[1][1] == other_galaxy[1][1]:
+                        pairs[(galaxy[0], other_galaxy[0])] = abs(galaxy[1][0] - other_galaxy[1][0])
+                    else:
+
+                        x1 = galaxy[1][0]
+                        y1 = galaxy[1][1]
+                        x2 = other_galaxy[1][0]
+                        y2 = other_galaxy[1][1]
+                        pairs[(galaxy[0], other_galaxy[0])] = abs(x2 - x1) + abs(y2 - y1)
+                    # else:
+                    #     path = astar.astar(f"{galaxy[1][0]},{galaxy[1][1]}", f"{other_galaxy[1][0]},{other_galaxy[1][1]}")
+                    #     path = list(path)
+                    #     pairs[(galaxy[0], other_galaxy[0])] = len(path)-1
                 print(f"Computed galaxies: {len(pairs)}")
 
     return sum(pairs.values())
