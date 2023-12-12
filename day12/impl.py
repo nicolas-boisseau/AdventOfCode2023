@@ -17,6 +17,7 @@ def process(part, filename):
 
         part1_results = []
         part2_results = []
+        part2_results2 = []
         for i, line in enumerate(lines):
             splitted = line.split(" ")
             spring_row = splitted[0]
@@ -34,21 +35,38 @@ def process(part, filename):
 
             if part == 2:
 
+                spring_row2 = f"{spring_row}?"
                 spring_row = multiply_sequence(spring_row, "?", 2)
+                records_raw2 = records_raw #multiply_sequence(records_raw, ",", 2)
                 records_raw = multiply_sequence(records_raw, ",", 2)
 
                 records = [int(d) for d in records_raw.split(",")]
+                records2 = [int(d) for d in records_raw2.split(",")]
 
                 # print(f"row = '{spring_row}', records={records}")
 
                 mutations = find_mutations(spring_row, records)
+                mutations2 = find_mutations(spring_row2, records2)
                 # print(f"row = '{spring_row}', nb_mutations={len(mutations)}")
 
                 part2_results.append(len(mutations))
-                mult = part1_results[i] * part2_results[i]
-                print(f"row = '{spring_row}', part1={part1_results[i]}, part1+?={part2_results[i]}, mult={mult}")
+                part2_results2.append(len(mutations2))
+                print(f"1. = '{spring_row}', part1={part1_results[i]}, x+?+x={part2_results[i]}")
+                print(f"2. = '{spring_row2}', part1={part1_results[i]}, x+?={part2_results2[i]}")
 
-                part2_results[i] = (part2_results[i] / part1_results[i]) * (part2_results[i] / part1_results[i]) * (part2_results[i] / part1_results[i]) * (part2_results[i] / part1_results[i]) * (part1_results[i])
+                a1 = part1_results[i]
+                b1 = part2_results[i]
+                a2 = part1_results[i]
+                b2 = part2_results2[i]
+
+                res1 = (b1 / a1)**4 * a1
+                res2 = (b2+(b2*a2) / a1)**4 * a1
+
+                print(f"1. = ({part2_results[i]} / {part1_results[i]})**4 * ({part1_results[i]})) = {res1}")
+                print(f"2. = (({part2_results2[i]}+({part2_results2[i]}*{part1_results[i]}) / {part1_results[i]})**4 * ({part1_results[i]}) = {res2}")
+                part2_results[i] = res1
+                part2_results2[i] = res2
+
 
 
         return int(sum(part1_results)) if part == 1 else int(sum(part2_results))
@@ -97,7 +115,7 @@ def get_mutations_for(n):
 def find_mutations(spring_row, records):
     joker_positions = find_char_positions(spring_row, "?")
     correct_mutations = []
-    possibles_mutations = list(get_mutations_for(len(joker_positions)))
+    possibles_mutations = [m for m in list(get_mutations_for(len(joker_positions))) if "##" not in m]
     for mutation in possibles_mutations:
         current = ""
         for i, c in enumerate(spring_row):
