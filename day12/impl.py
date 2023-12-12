@@ -1,4 +1,5 @@
 import os.path
+from functools import lru_cache
 from random import random
 
 from common.common import download_input_if_not_exists, post_answer, capture, capture_all
@@ -6,18 +7,70 @@ from common.common import download_input_if_not_exists, post_answer, capture, ca
 download_input_if_not_exists(2023)
 
 
+# BIG THANKS @Tavahiura Sang ! Saving my brain :)
+# https://github.com/tavash/advent-of-code/blob/main/2023/12/main.py
+
+@lru_cache # 💯🔥 memoize => https://wellsr.com/python/optimizing-recursive-functions-with-python-memoization/
+def get_arrangements(row,group):
+    row = row.lstrip('.') # supprime les '.' au début de la ligne
+    # debug
+    # print (row, group)
+    # '', ()
+    # '', (1,)
+    # combinaison trouvée si group est vide et row est vide
+    if len(row) == 0:
+        if len(group) == 0:
+            return 1
+        return 0
+
+    # combinaison trouvée si group est vide et row ne contient pas de '#'
+    if len(group) == 0:
+        if '#' not in row:
+            return 1
+        return 0
+
+    # row commence par '#'
+    if row.startswith('#'):
+        current_group = group[0]
+
+        # ex: "##" (4,) => impossible
+        if len(row) < current_group:
+            return 0
+
+        # ex: "##.???" (3,1)
+        if '.' in row[:current_group]:
+            return 0
+
+        # combinaison trouvée si taille row == current_group et group n'a qu'un élément
+        if len(row) == current_group:
+            if len(group) == 1:
+                return 1
+            return 0
+
+        # la séparation d'un spring doit être par un '.' ou '?'
+        if row[current_group] == '#':
+            return 0
+
+        # sinon on continue avec le reste de la ligne et le reste du group
+        return get_arrangements(row[current_group+1:], group[1:])
+
+    # commence forcément par un '?'
+    # si "?###?" (4,) alors
+    #   -> "####?" (4,)
+    #   -> ".###?" (4,)
+    return get_arrangements(row.replace("?", "#", 1), group) + get_arrangements(row[1:], group)
+
 def process(part, filename):
     if not (os.path.exists(filename)):
         print("Input file not found !")
 
     print("Input file OK ! Starting processing...")
 
+    result2 = 0
     with open(filename) as f:
         lines = [line.replace("\n", "") for line in f.readlines()]
 
         part1_results = []
-        part2_results = []
-        part2_results2 = []
         for i, line in enumerate(lines):
             splitted = line.split(" ")
             spring_row = splitted[0]
@@ -25,78 +78,50 @@ def process(part, filename):
 
             records = [int(d) for d in records_raw.split(",")]
 
-            #print(f"row = '{spring_row}', records={records}")
-
-            if "?" in spring_row:
+            if part == 1:
                 mutations = find_mutations(spring_row, records)
-                #print(f"row = '{spring_row}', nb_mutations={len(mutations)}")
-
                 part1_results.append(len(mutations))
 
             if part == 2:
 
-                spring_row2 = f"{spring_row}?"
-                spring_row = multiply_sequence(spring_row, "?", 2)
-                records_raw2 = records_raw #multiply_sequence(records_raw, ",", 2)
-                records_raw = multiply_sequence(records_raw, ",", 2)
-
+                # spring_row2 = f"{spring_row}?"
+                spring_row = multiply_sequence(spring_row, "?", 5)
+                # records_raw2 = records_raw #multiply_sequence(records_raw, ",", 2)
+                records_raw = multiply_sequence(records_raw, ",", 5)
+                #
                 records = [int(d) for d in records_raw.split(",")]
-                records2 = [int(d) for d in records_raw2.split(",")]
 
-                # print(f"row = '{spring_row}', records={records}")
+                result2 += get_arrangements(spring_row, tuple(records))
 
-                mutations = find_mutations(spring_row, records)
-                mutations2 = find_mutations(spring_row2, records2)
-                # print(f"row = '{spring_row}', nb_mutations={len(mutations)}")
-
-                part2_results.append(len(mutations))
-                part2_results2.append(len(mutations2))
-                print(f"1. = '{spring_row}', part1={part1_results[i]}, x+?+x={part2_results[i]}")
-                print(f"2. = '{spring_row2}', part1={part1_results[i]}, x+?={part2_results2[i]}")
-
-                a1 = part1_results[i]
-                b1 = part2_results[i]
-                a2 = part1_results[i]
-                b2 = part2_results2[i]
-
-                res1 = (b1 / a1)**4 * a1
-                res2 = (b2+(b2*a2) / a1)**4 * a1
-
-                print(f"1. = ({part2_results[i]} / {part1_results[i]})**4 * ({part1_results[i]})) = {res1}")
-                print(f"2. = (({part2_results2[i]}+({part2_results2[i]}*{part1_results[i]}) / {part1_results[i]})**4 * ({part1_results[i]}) = {res2}")
-                part2_results[i] = res1
-                part2_results2[i] = res2
-
-
-
-        return int(sum(part1_results)) if part == 1 else int(sum(part2_results))
-
-def compute_simplest(records):
-    current = ""
-    for i, r in enumerate(records):
-        current += "#" * r
-        if i < len(records) - 1:
-            current += "."
-    return current
-
-# def compute_possibilities(records, max_length):
-#     simplest = compute_simplest(records)
-#     possibilities = [simplest + "."*(max_length - len(simplest))]
-#     empty_positions = find_char_positions(simplest, ".")
-#     empty_positions.append(len(simplest)-1)
-#     to_fill = max_length - len(simplest)
-#
-#     append_if_valid = lambda p: possibilities.append(p) if is_match_record(p, records) else None
-#
-#     for i in range(to_fill):
-#         for j in range(i, to_fill):
-#             if empty_positions[i] == len(simplest)-1:
-#                 possibilities.append(possibilities[j][:empty_positions[i]] + "."*j)
-#             possibilities.append(possibilities[j][:empty_positions[i]] + "."*j + possibilities[j][empty_positions[i]+1:])
+                # records2 = [int(d) for d in records_raw2.split(",")]
+                #
+                # # print(f"row = '{spring_row}', records={records}")
+                #
+                # mutations = find_mutations(spring_row, records)
+                # mutations2 = find_mutations(spring_row2, records2)
+                # # print(f"row = '{spring_row}', nb_mutations={len(mutations)}")
+                #
+                # part2_results.append(len(mutations))
+                # part2_results2.append(len(mutations2))
+                # print(f"1. = '{spring_row}', part1={part1_results[i]}, x+?+x={part2_results[i]}")
+                # print(f"2. = '{spring_row2}', part1={part1_results[i]}, x+?={part2_results2[i]}")
+                #
+                # a1 = part1_results[i]
+                # b1 = part2_results[i]
+                # a2 = part1_results[i]
+                # b2 = part2_results2[i]
+                #
+                # res1 = (b1 / a1)**4 * a1
+                # res2 = (b2+(b2*a2) / a1)**4 * a1
+                #
+                # print(f"1. = ({part2_results[i]} / {part1_results[i]})**4 * ({part1_results[i]})) = {res1}")
+                # print(f"2. = (({part2_results2[i]}+({part2_results2[i]}*{part1_results[i]}) / {part1_results[i]})**4 * ({part1_results[i]}) = {res2}")
+                # part2_results[i] = res1
+                # part2_results2[i] = res2
 
 
 
-
+        return int(sum(part1_results)) if part == 1 else result2
 
 def multiply_sequence(spring_row, separator, n):
     return separator.join([spring_row for _ in range(n)])
