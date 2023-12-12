@@ -5,7 +5,7 @@ from impl import process
 class AdventOfCodeTests(unittest.TestCase):
 
     def test_part1_sample(self):
-        self.assertEqual(process(1, "sample.txt"), 374)
+        self.assertEqual(374, process(1, "sample.txt"))
 
     def test_part1_input(self):
         self.assertEqual(process(1, "input.txt"), 9177603)

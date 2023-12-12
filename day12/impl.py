@@ -16,24 +16,39 @@ def process(part, filename):
         lines = [line.replace("\n", "") for line in f.readlines()]
 
         total = 0
-        for line in lines[0:1]:
+        for line in lines:
             splitted = line.split(" ")
             spring_row = splitted[0]
             records_raw = splitted[1]
+            part1_results = []
+            part2_results = []
+            if part == 1:
+                records = [int(d) for d in records_raw.split(",")]
+
+                #print(f"row = '{spring_row}', records={records}")
+
+                if "?" in spring_row:
+                    mutations = find_mutations(spring_row, records)
+                    #print(f"row = '{spring_row}', nb_mutations={len(mutations)}")
+
+                    part1_results.append(len(mutations))
+
             if part == 2:
-                spring_row = multiply_sequence(spring_row, "?", 5)
-                records_raw = multiply_sequence(records_raw, ",", 5)
-            records = [int(d) for d in records_raw.split(",")]
 
-            #print(f"row = '{spring_row}', records={records}")
+                spring_row = multiply_sequence(spring_row, "?", 2)
+                records_raw = multiply_sequence(records_raw, ",", 2)
 
-            if "?" in spring_row:
+                records = [int(d) for d in records_raw.split(",")]
+
+                # print(f"row = '{spring_row}', records={records}")
+
                 mutations = find_mutations(spring_row, records)
-                #print(f"row = '{spring_row}', nb_mutations={len(mutations)}")
+                # print(f"row = '{spring_row}', nb_mutations={len(mutations)}")
 
-                total += len(mutations)
+                part2_results.append(len(mutations))
 
-        return total
+
+        return sum(part1_results) if part == 1 else sum(part2_results)
 
 def compute_simplest(records):
     current = ""
@@ -43,20 +58,20 @@ def compute_simplest(records):
             current += "."
     return current
 
-def compute_possibilities(records, max_length):
-    simplest = compute_simplest(records)
-    possibilities = [simplest + "."*(max_length - len(simplest))]
-    empty_positions = find_char_positions(simplest, ".")
-    empty_positions.append(len(simplest)-1)
-    to_fill = max_length - len(simplest)
-
-    append_if_valid = lambda p: possibilities.append(p) if is_match_record(p, records) else None
-
-    for i in range(to_fill):
-        for j in range(i, to_fill):
-            if empty_positions[i] == len(simplest)-1:
-                possibilities.append(possibilities[j][:empty_positions[i]] + "."*j)
-            possibilities.append(possibilities[j][:empty_positions[i]] + "."*j + possibilities[j][empty_positions[i]+1:])
+# def compute_possibilities(records, max_length):
+#     simplest = compute_simplest(records)
+#     possibilities = [simplest + "."*(max_length - len(simplest))]
+#     empty_positions = find_char_positions(simplest, ".")
+#     empty_positions.append(len(simplest)-1)
+#     to_fill = max_length - len(simplest)
+#
+#     append_if_valid = lambda p: possibilities.append(p) if is_match_record(p, records) else None
+#
+#     for i in range(to_fill):
+#         for j in range(i, to_fill):
+#             if empty_positions[i] == len(simplest)-1:
+#                 possibilities.append(possibilities[j][:empty_positions[i]] + "."*j)
+#             possibilities.append(possibilities[j][:empty_positions[i]] + "."*j + possibilities[j][empty_positions[i]+1:])
 
 
 

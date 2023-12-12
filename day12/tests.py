@@ -1,5 +1,5 @@
 import unittest
-from impl import process, is_match_record, get_mutations_for, multiply_sequence, find_mutations, compute_possibilities
+from impl import process, is_match_record, get_mutations_for, multiply_sequence, find_mutations
 
 
 class AdventOfCodeTests(unittest.TestCase):
@@ -25,9 +25,9 @@ class AdventOfCodeTests(unittest.TestCase):
         records = [int(d) for d in multiply_sequence("1,1,3", ",", 5).split(",")]
         self.assertEqual(1, len(find_mutations(spring_row, records)))
 
-    def test_compute_possibilities(self):
-        records = [1,1,3]
-        self.assertEqual(4, len(compute_possibilities(records, len(".??..??...?##."))))
+    # def test_compute_possibilities(self):
+    #     records = [1,1,3]
+    #     self.assertEqual(4, len(compute_possibilities(records, len(".??..??...?##."))))
 
     def test_part2_sample(self):
         self.assertEqual(1, process(2, "sample.txt"))
