@@ -30,7 +30,7 @@ class AdventOfCodeTests(unittest.TestCase):
     #     self.assertEqual(4, len(compute_possibilities(records, len(".??..??...?##."))))
 
     def test_part2_sample(self):
-        self.assertEqual(1, process(2, "sample.txt"))
+        self.assertEqual(506250, process(2, "sample.txt"))
 
     def test_part2_input(self):
         self.assertEqual(process(2, "input.txt"), 2508)

@@ -15,23 +15,22 @@ def process(part, filename):
     with open(filename) as f:
         lines = [line.replace("\n", "") for line in f.readlines()]
 
-        total = 0
-        for line in lines:
+        part1_results = []
+        part2_results = []
+        for i, line in enumerate(lines):
             splitted = line.split(" ")
             spring_row = splitted[0]
             records_raw = splitted[1]
-            part1_results = []
-            part2_results = []
-            if part == 1:
-                records = [int(d) for d in records_raw.split(",")]
 
-                #print(f"row = '{spring_row}', records={records}")
+            records = [int(d) for d in records_raw.split(",")]
 
-                if "?" in spring_row:
-                    mutations = find_mutations(spring_row, records)
-                    #print(f"row = '{spring_row}', nb_mutations={len(mutations)}")
+            #print(f"row = '{spring_row}', records={records}")
 
-                    part1_results.append(len(mutations))
+            if "?" in spring_row:
+                mutations = find_mutations(spring_row, records)
+                #print(f"row = '{spring_row}', nb_mutations={len(mutations)}")
+
+                part1_results.append(len(mutations))
 
             if part == 2:
 
@@ -46,9 +45,13 @@ def process(part, filename):
                 # print(f"row = '{spring_row}', nb_mutations={len(mutations)}")
 
                 part2_results.append(len(mutations))
+                mult = part1_results[i] * part2_results[i]
+                print(f"row = '{spring_row}', part1={part1_results[i]}, part1+?={part2_results[i]}, mult={mult}")
+
+                part2_results[i] = (part2_results[i] / part1_results[i]) * (part2_results[i] / part1_results[i]) * (part2_results[i] / part1_results[i]) * (part2_results[i] / part1_results[i]) * (part1_results[i])
 
 
-        return sum(part1_results) if part == 1 else sum(part2_results)
+        return int(sum(part1_results)) if part == 1 else int(sum(part2_results))
 
 def compute_simplest(records):
     current = ""
@@ -124,8 +127,8 @@ def is_match_record(spring_row, records):
 
 if __name__ == '__main__':
 
-    level = 1
-    expectedSampleResult = 21
+    level = 2
+    expectedSampleResult = 525152
     sampleFile = "sample.txt"
 
     if process(level, sampleFile) == expectedSampleResult:
