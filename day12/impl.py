@@ -16,13 +16,16 @@ def process(part, filename):
         lines = [line.replace("\n", "") for line in f.readlines()]
 
         total = 0
-        for line in lines:
+        for line in lines[0:1]:
             splitted = line.split(" ")
             spring_row = splitted[0]
-            records = [int(d) for d in splitted[1].split(",")]
+            records_raw = splitted[1]
+            if part == 2:
+                spring_row = multiply_sequence(spring_row, "?", 5)
+                records_raw = multiply_sequence(records_raw, ",", 5)
+            records = [int(d) for d in records_raw.split(",")]
 
             #print(f"row = '{spring_row}', records={records}")
-
 
             if "?" in spring_row:
                 mutations = find_mutations(spring_row, records)
@@ -32,10 +35,40 @@ def process(part, filename):
 
         return total
 
-def find_joker_positions(spring_row):
+def compute_simplest(records):
+    current = ""
+    for i, r in enumerate(records):
+        current += "#" * r
+        if i < len(records) - 1:
+            current += "."
+    return current
+
+def compute_possibilities(records, max_length):
+    simplest = compute_simplest(records)
+    possibilities = [simplest + "."*(max_length - len(simplest))]
+    empty_positions = find_char_positions(simplest, ".")
+    empty_positions.append(len(simplest)-1)
+    to_fill = max_length - len(simplest)
+
+    append_if_valid = lambda p: possibilities.append(p) if is_match_record(p, records) else None
+
+    for i in range(to_fill):
+        for j in range(i, to_fill):
+            if empty_positions[i] == len(simplest)-1:
+                possibilities.append(possibilities[j][:empty_positions[i]] + "."*j)
+            possibilities.append(possibilities[j][:empty_positions[i]] + "."*j + possibilities[j][empty_positions[i]+1:])
+
+
+
+
+
+def multiply_sequence(spring_row, separator, n):
+    return separator.join([spring_row for _ in range(n)])
+
+def find_char_positions(spring_row, char):
     jokers = []
     for i in range(len(spring_row)):
-        if spring_row[i] == "?":
+        if spring_row[i] == char:
             jokers.append(i)
     return jokers
 
@@ -44,7 +77,7 @@ def get_mutations_for(n):
         yield bin(i)[2:].zfill(n).replace("0", ".").replace("1", "#")
 
 def find_mutations(spring_row, records):
-    joker_positions = find_joker_positions(spring_row)
+    joker_positions = find_char_positions(spring_row, "?")
     correct_mutations = []
     possibles_mutations = list(get_mutations_for(len(joker_positions)))
     for mutation in possibles_mutations:
