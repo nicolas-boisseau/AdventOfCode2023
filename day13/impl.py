@@ -32,43 +32,64 @@ def process(part, filename):
 
         patterns = read_patterns(lines)
 
-        horizontal_reflects = []
-        vertical_reflects = []
         for pattern in patterns:
-            for i in range(0, len(pattern)):
-                j = i
-                max_reflect_horizontal = 0
-                reflect = 1
-                while 0 < j-reflect < len(pattern) - 1 and 0 < j+reflect < len(pattern) - 1:
-                    prev_line = pattern[j-reflect+1]
-                    next_line = pattern[j+reflect]
-                    if prev_line == next_line:
-                        reflect += 1
-                        if reflect > max_reflect_horizontal:
-                            max_reflect_horizontal = reflect
-                    else:
-                        break
-                horizontal_reflects.append((i, max_reflect_horizontal))
-            for i in range(0, len(pattern[0])):
-                j = i
-                max_reflect_vertical = 0
-                reflect = 1
-                while 0 < j-reflect < len(pattern) - 1 and 0 < j+reflect < len(pattern) - 1:
-                    prev_col = [pattern[k][j-reflect+1] for k in range(0, len(pattern))]
-                    next_col = [pattern[k][j+reflect] for k in range(0, len(pattern))]
-                    if prev_col == next_col:
-                        reflect += 1
-                        if reflect > max_reflect_vertical:
-                            max_reflect_vertical = reflect
-                    else:
-                        break
-                vertical_reflects.append((i, max_reflect_vertical))
+            horizontal_reflects = []
+            vertical_reflects = []
 
-            best_vertical_pos = Enumerable(vertical_reflects).order_by_descending(lambda x: x[1]).select(lambda x: x[0]).first()
-            best_horizontal_pos = Enumerable(horizontal_reflects).order_by_descending(lambda x: x[1]).select(lambda x: x[0]).first()
+            middle = len(pattern)//2 + 1
 
-            total_part_1 += best_vertical_pos * 100
-            total_part_1 += best_horizontal_pos
+            rev = pattern[0:middle]
+            rev.reverse()
+            if "".join(rev) == "".join(pattern[middle:]):
+                print(middle)
+            else:
+                rev = pattern[0:middle-1]
+                rev.reverse()
+                if "".join(pattern[0:middle-1]) == "".join(pattern[middle-1:len(pattern)-2]):
+                    print(middle-1)
+                else:
+                    rev = pattern[0:middle - 1]
+                    rev.reverse()
+                    if "".join(pattern[1:middle+1]) == "".join(pattern[middle+1:]):
+                        print(middle+1)
+
+            # for i in range(0, len(pattern[0])):
+            #     max_reflect_vertical = 0
+            #     reflect = 1
+            #     is_reflect = False
+            #     while 0 < i-reflect+1 < len(pattern) - 1 and 0 < i+reflect < len(pattern) - 1:
+            #         prev_col = [pattern[k][i-reflect+1] for k in range(0, len(pattern))]
+            #         next_col = [pattern[k][i+reflect] for k in range(0, len(pattern))]
+            #         if prev_col == next_col:
+            #             reflect += 1
+            #             is_reflect = True
+            #         else:
+            #             break
+            #     if is_reflect and reflect >= len(pattern[0])//2:
+            #         vertical_reflects.append(i)
+            #
+            # for i in range(0, len(pattern)):
+            #     max_reflect_horizontal = 0
+            #     reflect = 1
+            #     is_reflect = False
+            #     while 0 < i-reflect+1 < len(pattern) - 1 and 0 < i+reflect < len(pattern) - 1:
+            #         prev_line = pattern[i-reflect+1]
+            #         next_line = pattern[i+reflect]
+            #         if prev_line == next_line:
+            #             reflect += 1
+            #             is_reflect = True
+            #         else:
+            #             break
+            #     if is_reflect and reflect >= len(pattern)//2:
+            #         horizontal_reflects.append(i)
+
+
+
+            print(horizontal_reflects)
+            print(vertical_reflects)
+
+            # total_part_1 += best_vertical_pos * 100
+            # total_part_1 += best_horizontal_pos
 
         return total_part_1
 
