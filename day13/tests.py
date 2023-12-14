@@ -11,7 +11,7 @@ class AdventOfCodeTests(unittest.TestCase):
         self.assertEqual(405, process(1, "sample2.txt"))
 
     def test_part1_input(self):
-        self.assertEqual(process(1, "input.txt"), 30518)
+        self.assertEqual(30518, process(1, "input.txt"))
 
     def test_part2_sample(self):
         self.assertEqual(process(2, "sample.txt"), 19)
