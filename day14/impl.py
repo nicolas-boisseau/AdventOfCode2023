@@ -14,7 +14,7 @@ def get_balls_positions(lines):
     for y, line in enumerate(lines):
         for x, c in enumerate(line):
             if c == "O":
-                yield x, y
+                yield y, x
 
 def print_lines(lines):
     for line in lines:
@@ -37,10 +37,10 @@ def process(part, filename):
         while True:
             new = prev.copy()
             for ball in balls:
-                x, y = ball
+                y, x = ball
 
                 # move up if possible and up is not "#"
-                if y > 0 and lines[y-1][x] != "#" and lines[y-1][x] != "O":
+                if y > 0 and new[y-1][x] != "#" and new[y-1][x] != "O":
                     new[y-1] = new[y-1][:x] + "O" + new[y-1][x+1:]
                     new[y] = new[y][:x] + "." + new[y][x+1:]
             if new == prev:
@@ -52,7 +52,7 @@ def process(part, filename):
 
         score = 0
         for i, line in enumerate(prev):
-            score += line.count("O") * len(prev) - i
+            score += line.count("O") * (len(prev) - i)
             print(line)
 
 
@@ -66,7 +66,7 @@ def process(part, filename):
 if __name__ == '__main__':
 
     level = 1
-    expectedSampleResult = -1
+    expectedSampleResult = 136
     sampleFile = "sample.txt"
 
     if process(level, sampleFile) == expectedSampleResult:

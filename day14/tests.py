@@ -5,13 +5,13 @@ from impl import process
 class AdventOfCodeTests(unittest.TestCase):
 
     def test_part1_sample(self):
-        self.assertEqual(process(1, "sample.txt"), 7)
+        self.assertEqual(process(1, "sample.txt"), 136)
 
     def test_part1_input(self):
-        self.assertEqual(process(1, "input.txt"), 1804)
+        self.assertEqual(process(1, "input.txt"), 105249)
 
     def test_part2_sample(self):
-        self.assertEqual(process(2, "sample.txt"), 19)
+        self.assertEqual(process(2, "sample.txt"), 64)
 
     def test_part2_input(self):
         self.assertEqual(process(2, "input.txt"), 2508)
