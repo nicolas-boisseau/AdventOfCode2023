@@ -11,12 +11,7 @@ class AdventOfCodeTests(unittest.TestCase):
         self.assertEqual(405, process(1, "sample2.txt"))
 
     def test_part1_input(self):
-        # 33659 is too high
-        # 33575 is too high
-        # 33171 is too high ?
-        # 26936 KO
-        # 24492 KO
-        self.assertEqual(process(1, "input.txt"), 1804)
+        self.assertEqual(process(1, "input.txt"), 30518)
 
     def test_part2_sample(self):
         self.assertEqual(process(2, "sample.txt"), 19)
