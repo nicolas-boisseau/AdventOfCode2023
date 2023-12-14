@@ -90,7 +90,8 @@ def process(part, filename):
             else:
                 vertical_reflects.append(max[1])
 
-            print()
+            print(horizontal_reflects)
+            print(vertical_reflects)
 
         total_part_1 += sum(horizontal_reflects) * 100
         total_part_1 += sum(vertical_reflects)
