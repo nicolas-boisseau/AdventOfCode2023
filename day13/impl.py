@@ -51,7 +51,7 @@ def reflections(pattern):
             j += 1
         if j > 0 and (j == len(before) or j == len(after)):
             reflections.append(("v", i, j))
-            break
+            #break
 
     for i in range(0, len(pattern)):
         before = reversed(rows_before(pattern, i))
@@ -61,17 +61,22 @@ def reflections(pattern):
             j += 1
         if j > 0 and (j == len(before) or j == len(after)):
             reflections.append(("h", i, j))
-            break
+            #break
     return reflections
 
 def mutations(pattern):
     for y in range(0, len(pattern)):
         for x in range(0, len(pattern[0])):
-            mutant = pattern.copy()
-            #mutant[y][x] = "#" if mutant[y][x] == "." else "."
-            mutant[y] = mutant[y][:x] + ("#" if mutant[y][x] == "." else ".") + mutant[y][x+1:]
-            yield mutant
 
+            mutant = pattern.copy()
+
+            mutant[y] = mutant[y][:x] + ("#" if mutant[y][x] == "." else ".") + mutant[y][x+1:]
+
+            yield mutant
+def print_pattern(pattern):
+    for line in pattern:
+        print(line)
+    print()
 
 def process(part, filename):
     if not (os.path.exists(filename)):
@@ -101,7 +106,10 @@ def process(part, filename):
             horizontal_reflects = []
             vertical_reflects = []
             for i, pattern in enumerate(patterns):
-                for mutant in mutations(pattern):
+                mutants = list(mutations(pattern))
+                print(f"nb mutants = {len(mutants)}")
+                mutant_found = False
+                for mutant in mutants:
                     r = reflections(mutant)
                     if len(r) == 0 or (len(r) == 1 and r[0] == initial_reflects[i]):
                         continue
@@ -119,7 +127,10 @@ def process(part, filename):
                     else:
                         vertical_reflects.append(r[0][1])
 
+                    mutant_found = True
                     break
+                if not mutant_found:
+                    raise Exception("No mutant found")
 
             total += sum(horizontal_reflects) * 100
             total += sum(vertical_reflects)
