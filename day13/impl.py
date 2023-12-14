@@ -48,13 +48,15 @@ def process(part, filename):
         vertical_reflects = []
         for pattern in patterns:
 
+            current_horizontal_reflects = []
+            current_vertical_reflects = []
 
             middle = len(pattern)//2 + 1
 
             if reversed(pattern[0:middle-1]) == pattern[middle-1:len(pattern)-1]:
-                horizontal_reflects.append(middle-1)
+                current_horizontal_reflects.append(middle-1)
             elif reversed(pattern[1:middle]) == pattern[middle:]:
-                horizontal_reflects.append(middle)
+                current_horizontal_reflects.append(middle)
 
             middle_v = len(pattern[0])//2 + 1
 
@@ -70,7 +72,7 @@ def process(part, filename):
 
 
             if reversed(cols_left) == cols_right:
-                vertical_reflects.append(middle-1)
+                current_vertical_reflects.append(middle-1)
             else:
                 cols_left = []
                 for i in range(1, middle):
@@ -80,9 +82,10 @@ def process(part, filename):
                     cols_right.append("".join([c[i] for c in pattern]))
 
                 if reversed(cols_left) == cols_right:
-                    vertical_reflects.append(middle)
+                    current_vertical_reflects.append(middle)
 
-
+            horizontal_reflects.append(current_horizontal_reflects)
+            vertical_reflects.append(current_vertical_reflects)
 
 
 
