@@ -23,14 +23,23 @@ def reversed(list):
     list.reverse()
     return list
 
-def rotate_90(pattern):
-    rotated_pattern = []
-    for j in range(len(pattern[0])):
-        current = ""
-        for i in range(len(pattern)):
-            current += pattern[i][j]
-        rotated_pattern.append(current)
-    return rotated_pattern
+def rows_before(pattern, index):
+    return pattern[:index]
+
+def rows_after(pattern, index):
+    return pattern[index:]
+
+def cols_before(pattern, index):
+    cols = []
+    for i in range(0, index):
+        cols.append("".join([c[i] for c in pattern]))
+    return cols
+
+def cols_after(pattern, index):
+    cols_right = []
+    for i in range(index, len(pattern[0])):
+        cols_right.append("".join([c[i] for c in pattern]))
+    return cols_right
 
 def process(part, filename):
     if not (os.path.exists(filename)):
@@ -51,46 +60,29 @@ def process(part, filename):
             current_horizontal_reflects = []
             current_vertical_reflects = []
 
-            middle = len(pattern)//2 + 1
+            for i in range(0, len(pattern)):
+                before = rows_before(pattern, i)
+                after = rows_after(pattern, i)
+                if before == reversed(after[:len(before)-1]):
+                    current_horizontal_reflects.append(i)
+                elif before[1:] == reversed(after):
+                    current_horizontal_reflects.append(i)
 
-            if reversed(pattern[0:middle-1]) == pattern[middle-1:len(pattern)-1]:
-                current_horizontal_reflects.append(middle-1)
-            elif reversed(pattern[1:middle]) == pattern[middle:]:
-                current_horizontal_reflects.append(middle)
+            for i in range(0, len(pattern[0])):
+                before = cols_before(pattern, i)
+                after = cols_after(pattern, i)
+                if before == reversed(after[:len(before)-1]):
+                    current_vertical_reflects.append(i)
+                elif before[1:] == reversed(after):
+                    current_vertical_reflects.append(i)
 
-            middle_v = len(pattern[0])//2 + 1
+            print(current_horizontal_reflects)
+            print(current_vertical_reflects)
 
-            # rotate pattern
-            middle = len(pattern[0]) // 2 + 1
-
-            cols_left = []
-            for i in range(0, middle-1):
-                cols_left.append("".join([c[i] for c in pattern]))
-            cols_right = []
-            for i in range(middle-1, len(pattern[0])-1):
-                cols_right.append("".join([c[i] for c in pattern]))
-
-
-            if reversed(cols_left) == cols_right:
-                current_vertical_reflects.append(middle-1)
-            else:
-                cols_left = []
-                for i in range(1, middle):
-                    cols_left.append("".join([c[i] for c in pattern]))
-                cols_right = []
-                for i in range(middle, len(pattern[0])):
-                    cols_right.append("".join([c[i] for c in pattern]))
-
-                if reversed(cols_left) == cols_right:
-                    current_vertical_reflects.append(middle)
-
-            horizontal_reflects.append(current_horizontal_reflects)
-            vertical_reflects.append(current_vertical_reflects)
-
-
-
-            print(f"h: {horizontal_reflects}")
-            print(f"v: {vertical_reflects}")
+            for x in current_horizontal_reflects:
+                horizontal_reflects.append(x)
+            for y in current_vertical_reflects:
+                vertical_reflects.append(y)
 
             print()
 
