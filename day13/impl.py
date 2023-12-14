@@ -23,21 +23,21 @@ def reversed(list):
     list.reverse()
     return list
 
-def rows_before(pattern, index):
-    return pattern[:index]
+def rows_before(pattern, index, reductor=0):
+    return pattern[reductor:index]
 
-def rows_after(pattern, index):
-    return pattern[index:]
+def rows_after(pattern, index, reductor=0):
+    return pattern[index:len(pattern)-reductor]
 
-def cols_before(pattern, index):
+def cols_before(pattern, index, reductor=0):
     cols = []
-    for i in range(0, index):
+    for i in range(reductor, index):
         cols.append("".join([c[i] for c in pattern]))
     return cols
 
-def cols_after(pattern, index):
+def cols_after(pattern, index, reductor=0):
     cols_right = []
-    for i in range(index, len(pattern[0])):
+    for i in range(index, len(pattern[0])-reductor):
         cols_right.append("".join([c[i] for c in pattern]))
     return cols_right
 
@@ -57,32 +57,38 @@ def process(part, filename):
         vertical_reflects = []
         for pattern in patterns:
 
-            current_horizontal_reflects = []
-            current_vertical_reflects = []
-
-            for i in range(0, len(pattern)):
-                before = rows_before(pattern, i)
-                after = rows_after(pattern, i)
-                if before == reversed(after[:len(before)-1]):
-                    current_horizontal_reflects.append(i)
-                elif before[1:] == reversed(after):
-                    current_horizontal_reflects.append(i)
+            reflections = []
 
             for i in range(0, len(pattern[0])):
-                before = cols_before(pattern, i)
+                before = reversed(cols_before(pattern, i))
                 after = cols_after(pattern, i)
-                if before == reversed(after[:len(before)-1]):
-                    current_vertical_reflects.append(i)
-                elif before[1:] == reversed(after):
-                    current_vertical_reflects.append(i)
+                j = 0
+                while j < len(before) and j < len(after) and before[j] == after[j]:
+                    j += 1
+                if j > 0:
+                    reflections.append(("v", i, j))
+                    break
 
-            print(current_horizontal_reflects)
-            print(current_vertical_reflects)
 
-            for x in current_horizontal_reflects:
-                horizontal_reflects.append(x)
-            for y in current_vertical_reflects:
-                vertical_reflects.append(y)
+            for i in range(0, len(pattern)):
+                before = reversed(rows_before(pattern, i))
+                after = rows_after(pattern, i)
+                j = 0
+                while j < len(before) and j < len(after) and before[j] == after[j]:
+                    j += 1
+                if j > 0:
+                    reflections.append(("h", i, j))
+                    break
+
+
+            print(reflections)
+
+            max = Enumerable(reflections).order_by_descending(lambda x: x[2]).first()
+
+            if max[0] == "h":
+                horizontal_reflects.append(max[1])
+            else:
+                vertical_reflects.append(max[1])
 
             print()
 

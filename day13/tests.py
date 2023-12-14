@@ -13,6 +13,9 @@ class AdventOfCodeTests(unittest.TestCase):
     def test_part1_input(self):
         # 33659 is too high
         # 33575 is too high
+        # 33171 is too high ?
+        # 26936 KO
+        # 24492 KO
         self.assertEqual(process(1, "input.txt"), 1804)
 
     def test_part2_sample(self):
@@ -32,6 +35,19 @@ class AdventOfCodeTests(unittest.TestCase):
             middle = len(patterns[0]) // 2 + 1
             print(f"rows_before = {rows_before(patterns[0], middle)}")
             print(f"rows_after = {rows_after(patterns[0], middle)}")
+
+    def test_nico(self):
+        with open("test.txt") as f:
+            lines = [line.replace("\n", "") for line in f.readlines()]
+
+            reductor=2
+            patterns = read_patterns(lines)
+            middle = len(patterns[0]) // 2 + 1
+            print(f"cols_before = {cols_before(patterns[0], middle, reductor)}")
+            print(f"cols_after = {cols_after(patterns[0], middle, reductor)}")
+            middle = len(patterns[0]) // 2 + 1
+            print(f"rows_before = {rows_before(patterns[0], middle, reductor)}")
+            print(f"rows_after = {rows_after(patterns[0], middle, reductor)}")
 
 if __name__ == '__main__':
     unittest.main()
