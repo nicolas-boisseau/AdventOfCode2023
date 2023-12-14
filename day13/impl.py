@@ -64,13 +64,22 @@ def reflections(pattern):
             break
     return reflections
 
+def mutations(pattern):
+    for y in range(0, len(pattern)):
+        for x in range(0, len(pattern[0])):
+            mutant = pattern.copy()
+            #mutant[y][x] = "#" if mutant[y][x] == "." else "."
+            mutant[y] = mutant[y][:x] + ("#" if mutant[y][x] == "." else ".") + mutant[y][x+1:]
+            yield mutant
+
+
 def process(part, filename):
     if not (os.path.exists(filename)):
         print("Input file not found !")
 
     print("Input file OK ! Starting processing...")
 
-    total_part_1 = 0
+    total = 0
     with open(filename) as f:
         lines = [line.replace("\n", "") for line in f.readlines()]
 
@@ -78,24 +87,50 @@ def process(part, filename):
 
         horizontal_reflects = []
         vertical_reflects = []
-        for pattern in patterns:
-
+        initial_reflects = {}
+        for i, pattern in enumerate(patterns):
             r = reflections(pattern)
-
-            print(r)
-
+            #print(r)
             if r[0][0] == "h":
                 horizontal_reflects.append(r[0][1])
             else:
                 vertical_reflects.append(r[0][1])
+            initial_reflects[i] = r[0]
 
-            #print(horizontal_reflects)
-            #print(vertical_reflects)
+        if part == 2:
+            horizontal_reflects = []
+            vertical_reflects = []
+            for i, pattern in enumerate(patterns):
+                for mutant in mutations(pattern):
+                    r = reflections(mutant)
+                    if len(r) == 0 or (len(r) == 1 and r[0] == initial_reflects[i]):
+                        continue
 
-        total_part_1 += sum(horizontal_reflects) * 100
-        total_part_1 += sum(vertical_reflects)
+                    print(f"new reflects = {len(r)}")
+                    print(f"initial reflects = {initial_reflects[i]}")
+                    print(f"new reflects = {r}")
+                    r = [rr for rr in r if rr != initial_reflects[i]]
+                    print(f"to keep reflects = {r}")
+                    print()
 
-        return total_part_1
+                    #print(r)
+                    if r[0][0] == "h":
+                        horizontal_reflects.append(r[0][1])
+                    else:
+                        vertical_reflects.append(r[0][1])
+
+                    break
+
+            total += sum(horizontal_reflects) * 100
+            total += sum(vertical_reflects)
+
+            return total
+
+        else:
+            total += sum(horizontal_reflects) * 100
+            total += sum(vertical_reflects)
+
+            return total
 
 
 

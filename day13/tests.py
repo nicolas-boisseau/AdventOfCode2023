@@ -14,10 +14,11 @@ class AdventOfCodeTests(unittest.TestCase):
         self.assertEqual(30518, process(1, "input.txt"))
 
     def test_part2_sample(self):
-        self.assertEqual(process(2, "sample.txt"), 19)
+        self.assertEqual(400, process(2, "sample.txt"))
 
     def test_part2_input(self):
-        self.assertEqual(process(2, "input.txt"), 2508)
+        # 22862 is too low
+        self.assertEqual(0, process(2, "input.txt"))
 
     def test_nico(self):
         with open("test.txt") as f:
