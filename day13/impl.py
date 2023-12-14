@@ -65,7 +65,7 @@ def process(part, filename):
                 j = 0
                 while j < len(before) and j < len(after) and before[j] == after[j]:
                     j += 1
-                if j > 0:
+                if j > 0 and (j == len(before) or j == len(after)):
                     reflections.append(("v", i, j))
                     break
 
@@ -76,7 +76,7 @@ def process(part, filename):
                 j = 0
                 while j < len(before) and j < len(after) and before[j] == after[j]:
                     j += 1
-                if j > 0:
+                if j > 0 and (j == len(before) or j == len(after)):
                     reflections.append(("h", i, j))
                     break
 
