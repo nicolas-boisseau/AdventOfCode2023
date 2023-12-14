@@ -41,6 +41,29 @@ def cols_after(pattern, index, reductor=0):
         cols_right.append("".join([c[i] for c in pattern]))
     return cols_right
 
+def reflections(pattern):
+    reflections = []
+    for i in range(0, len(pattern[0])):
+        before = reversed(cols_before(pattern, i))
+        after = cols_after(pattern, i)
+        j = 0
+        while j < len(before) and j < len(after) and before[j] == after[j]:
+            j += 1
+        if j > 0 and (j == len(before) or j == len(after)):
+            reflections.append(("v", i, j))
+            break
+
+    for i in range(0, len(pattern)):
+        before = reversed(rows_before(pattern, i))
+        after = rows_after(pattern, i)
+        j = 0
+        while j < len(before) and j < len(after) and before[j] == after[j]:
+            j += 1
+        if j > 0 and (j == len(before) or j == len(after)):
+            reflections.append(("h", i, j))
+            break
+    return reflections
+
 def process(part, filename):
     if not (os.path.exists(filename)):
         print("Input file not found !")
@@ -57,41 +80,17 @@ def process(part, filename):
         vertical_reflects = []
         for pattern in patterns:
 
-            reflections = []
+            r = reflections(pattern)
 
-            for i in range(0, len(pattern[0])):
-                before = reversed(cols_before(pattern, i))
-                after = cols_after(pattern, i)
-                j = 0
-                while j < len(before) and j < len(after) and before[j] == after[j]:
-                    j += 1
-                if j > 0 and (j == len(before) or j == len(after)):
-                    reflections.append(("v", i, j))
-                    break
+            print(r)
 
-
-            for i in range(0, len(pattern)):
-                before = reversed(rows_before(pattern, i))
-                after = rows_after(pattern, i)
-                j = 0
-                while j < len(before) and j < len(after) and before[j] == after[j]:
-                    j += 1
-                if j > 0 and (j == len(before) or j == len(after)):
-                    reflections.append(("h", i, j))
-                    break
-
-
-            print(reflections)
-
-            max = Enumerable(reflections).order_by_descending(lambda x: x[2]).first()
-
-            if max[0] == "h":
-                horizontal_reflects.append(max[1])
+            if r[0][0] == "h":
+                horizontal_reflects.append(r[0][1])
             else:
-                vertical_reflects.append(max[1])
+                vertical_reflects.append(r[0][1])
 
-            print(horizontal_reflects)
-            print(vertical_reflects)
+            #print(horizontal_reflects)
+            #print(vertical_reflects)
 
         total_part_1 += sum(horizontal_reflects) * 100
         total_part_1 += sum(vertical_reflects)
