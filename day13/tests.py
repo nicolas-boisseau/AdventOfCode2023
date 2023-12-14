@@ -7,6 +7,9 @@ class AdventOfCodeTests(unittest.TestCase):
     def test_part1_sample(self):
         self.assertEqual(process(1, "sample.txt"), 405)
 
+    def test_part1_sample2(self):
+        self.assertEqual(405, process(1, "sample2.txt"))
+
     def test_part1_input(self):
         self.assertEqual(process(1, "input.txt"), 1804)
 
