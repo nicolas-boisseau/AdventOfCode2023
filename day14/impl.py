@@ -73,17 +73,19 @@ def process(part, filename):
                         h = "".join(new)
                         if h in cycles:
                             print("FOUND !!")
-                            print(f"Cycle found at {cycles[h]}")
+                            print(f"Cycle found at {cycle} which was same as {cycles[h]}")
 
                             j = cycles[h]
+                            cycle_len = cycle - cycles[h]
+                            print(f"Cycle len = {cycle_len}")
 
                             score = 0
-                            value_at_1000000000 = all_cycles[(1000000000 - j) % len(cycles)]
+                            value_at_1000000000 = all_cycles[(1000000000 - j) % cycle_len + j - 1]
                             for i, line in enumerate(value_at_1000000000):
                                 score += line.count("O") * (len(value_at_1000000000) - i)
                             return score
-
-                        cycles[h] = i
+                        else:
+                            cycles[h] = cycle
                     turn = (turn + 1) % len(turns)
                     break
                 prev = new

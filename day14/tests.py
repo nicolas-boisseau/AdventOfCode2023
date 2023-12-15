@@ -14,9 +14,7 @@ class AdventOfCodeTests(unittest.TestCase):
         self.assertEqual(64, process(2, "sample.txt"))
 
     def test_part2_input(self):
-        # 88718 too high
-        # 88697 too high
-        self.assertEqual(0, process(2, "input.txt"))
+        self.assertEqual(88680, process(2, "input.txt"))
 
 
 if __name__ == '__main__':
