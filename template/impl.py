@@ -14,10 +14,9 @@ def part2(lines):
 if __name__ == '__main__':
 
     part = 1
-    part_func = part1 if part == 1 else part2
     expectedSampleResult = -1
-    sampleFile = "sample.txt"
 
+    part_func = part1 if part == 1 else part2
     if part_func(read_input_lines("sample.txt")) == expectedSampleResult:
         print(f"Sample for part {part} OK")
 
