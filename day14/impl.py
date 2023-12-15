@@ -18,7 +18,9 @@ def get_balls_positions(lines):
 
 def print_lines(lines):
     for line in lines:
-        print(line)
+        for l in line:
+            print(l, end="", flush=True)
+        print()
 
 def process(part, filename):
     if not (os.path.exists(filename)):
@@ -35,12 +37,18 @@ def process(part, filename):
         print(lines == lines.copy())
         prev = lines
         turns = ["N"]
+        nb_cycle = 1
         if part == 2:
             turns = ["N", "W", "S", "E"]
+            nb_cycle = 1000
         turn = 0
-        for i in range(len(turns)*1):
+        cycles = {}
+        cycle = 0
+        all_cycles = []
+        for i in range(len(turns) * nb_cycle):
             while True:
                 new = prev.copy()
+                balls = get_balls_positions(new)
                 for ball in balls:
                     y, x = ball
 
@@ -59,17 +67,53 @@ def process(part, filename):
                         new[y] = new[y][:x] + "." + new[y][x+1:]
 
                 if new == prev:
+                    if turn == len(turns)-1:
+                        cycle += 1
+                        all_cycles.append(new)
+                        h = "".join(new)
+                        if h in cycles:
+                            print("FOUND !!")
+                            print(f"Cycle found at {cycles[h]}")
+
+                            j = cycles[h]
+
+                            score = 0
+                            value_at_1000000000 = all_cycles[(1000000000 - j) % len(cycles)]
+                            for i, line in enumerate(value_at_1000000000):
+                                score += line.count("O") * (len(value_at_1000000000) - i)
+                            return score
+
+                        cycles[h] = i
                     turn = (turn + 1) % len(turns)
                     break
-                balls = get_balls_positions(new)
                 prev = new
-                print_lines(new)
-                print()
+
+
 
         score = 0
-        for i, line in enumerate(prev):
-            score += line.count("O") * (len(prev) - i)
-            print(line)
+        if part == 1:
+            for i, line in enumerate(prev):
+                score += line.count("O") * (len(prev) - i)
+                print(line)
+        else:
+            print("After cycle : ")
+            print_lines(new)
+            print()
+
+            l_range = 5
+
+            print(f"Nb cycles = {len(cycles)}")
+            last_range_cycle = cycles[len(cycles)-l_range:]
+            i = len(cycles) - 1 - l_range
+            while cycles[i:i+l_range] != last_range_cycle and i > 0:
+                i -= 1
+            if cycles[i:i+l_range] == last_range_cycle:
+                print(f"Cycle found at {i}")
+            else:
+                raise Exception("Cycle not found !")
+
+            loop = cycles[i:]
+
 
 
 
