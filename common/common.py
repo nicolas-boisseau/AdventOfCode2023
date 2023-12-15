@@ -26,6 +26,12 @@ def download_input_if_not_exists(year):
         data = response.read()
         out_file.write(data)
 
+def read_input_lines(filename):
+    if not (os.path.exists(filename)):
+        print("Input file not found !")
+    with open(filename) as f:
+        lines = [line.replace("\n", "") for line in f.readlines()]
+    return lines
 
 def detect_current_day():
     current_dir = os.getcwd()
