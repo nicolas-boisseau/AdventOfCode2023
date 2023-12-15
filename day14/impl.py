@@ -90,39 +90,13 @@ def process(part, filename):
                     break
                 prev = new
 
-
-
         score = 0
         if part == 1:
             for i, line in enumerate(prev):
                 score += line.count("O") * (len(prev) - i)
                 print(line)
-        else:
-            print("After cycle : ")
-            print_lines(new)
-            print()
-
-            l_range = 5
-
-            print(f"Nb cycles = {len(cycles)}")
-            last_range_cycle = cycles[len(cycles)-l_range:]
-            i = len(cycles) - 1 - l_range
-            while cycles[i:i+l_range] != last_range_cycle and i > 0:
-                i -= 1
-            if cycles[i:i+l_range] == last_range_cycle:
-                print(f"Cycle found at {i}")
-            else:
-                raise Exception("Cycle not found !")
-
-            loop = cycles[i:]
-
-
-
 
         return score
-
-
-
 
 
 if __name__ == '__main__':
