@@ -101,36 +101,17 @@ def part1(lines, start=(0, 0, 0, 1)):
 
 def part2(lines):
     max_energy = 0
-    for y in range(0, len(lines)):
-        for x in range(0, len(lines[0])):
-            # edges only
-            if y != 0 and y != len(lines) - 1 and x != 0 and x != len(lines[0]) - 1:
-                continue
+    rows = len(lines)
+    cols = len(lines[0])
 
-            dx = dy = 0
-            # corners
-            if y == 0 and x == 0:
-                max_energy = max(max_energy, part1(lines, (y, x, 1, 0)))
-                max_energy = max(max_energy, part1(lines, (y, x, 0, 1)))
-            elif y == len(lines) - 1 and x == 0:
-                max_energy = max(max_energy, part1(lines, (y, x, -1, 0)))
-                max_energy = max(max_energy, part1(lines, (y, x, 0, 1)))
-            elif y == 0 and x == len(lines[0]) - 1:
-                max_energy = max(max_energy, part1(lines, (y, x, 1, 0)))
-                max_energy = max(max_energy, part1(lines, (y, x, 0, -1)))
-            elif y == len(lines) - 1 and x == len(lines[0]) - 1:
-                max_energy = max(max_energy, part1(lines, (y, x, -1, 0)))
-                max_energy = max(max_energy, part1(lines, (y, x, 0, -1)))
-            else:
-                if y == 0:
-                    dy = 1
-                elif y == len(lines) - 1:
-                    dy = -1
-                elif x == 0:
-                    dx = 1
-                elif x == len(lines[0]) - 1:
-                    dx = -1
-                max_energy = max(max_energy, part1(lines, (y, x, dy, dx)))
+    for y in range(rows):
+        max_energy = max(max_energy, part1(lines, (y, 0, 0, 1)))
+        max_energy = max(max_energy, part1(lines, (y, cols-1, 0, -1)))
+
+    for x in range(cols):
+        max_energy = max(max_energy, part1(lines, (0, x, 1, 0)))
+        max_energy = max(max_energy, part1(lines, (rows-1, x, -1, 0)))
+
     return max_energy
 
 
