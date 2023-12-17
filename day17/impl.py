@@ -20,7 +20,7 @@ new_directions = {
 }
 
 class Node:
-    def __init__(self, y, x, dir, speed, heatloss, board, h, w):
+    def __init__(self, y, x, dir, speed, heatloss, board, h, w, min_speed, max_speed):
         self.y = y
         self.x = x
         self.dir = dir
@@ -29,9 +29,11 @@ class Node:
         self.heatloss = heatloss
         self.h = h
         self.w = w
+        self.min_speed = min_speed
+        self.max_speed = max_speed
 
     def forward(self):
-        if self.speed < 3:
+        if self.speed < self.max_speed:
             new_y = self.y + directions[self.dir][0]
             new_x = self.x + directions[self.dir][1]
             if self.is_out_of_bounds(new_y, new_x):
@@ -39,12 +41,14 @@ class Node:
             new_speed = self.speed + 1
             new_heatloss = self.heatloss + self.board[(new_y, new_x)]
             return [
-                Node(new_y, new_x, self.dir, new_speed, new_heatloss, self.board, self.h, self.w),
+                Node(new_y, new_x, self.dir, new_speed, new_heatloss, self.board, self.h, self.w, self.min_speed, self.max_speed),
             ]
         return []
 
 
     def left(self):
+        if self.speed < self.min_speed:
+            return []
         new_dir = new_directions[self.dir][0]
         new_y = self.y + directions[new_dir][0]
         new_x = self.x + directions[new_dir][1]
@@ -53,9 +57,11 @@ class Node:
         new_speed = 1
         new_heatloss = self.heatloss + self.board[(new_y, new_x)]
         return [
-            Node(new_y, new_x, new_dir, new_speed, new_heatloss, self.board, self.h, self.w),
+            Node(new_y, new_x, new_dir, new_speed, new_heatloss, self.board, self.h, self.w, self.min_speed, self.max_speed),
         ]
     def right(self):
+        if self.speed < self.min_speed:
+            return []
         new_dir = new_directions[self.dir][1]
         new_y = self.y + directions[new_dir][0]
         new_x = self.x + directions[new_dir][1]
@@ -64,7 +70,7 @@ class Node:
         new_speed = 1
         new_heatloss = self.heatloss + self.board[(new_y, new_x)]
         return [
-            Node(new_y, new_x, new_dir, new_speed, new_heatloss, self.board, self.h, self.w),
+            Node(new_y, new_x, new_dir, new_speed, new_heatloss, self.board, self.h, self.w, self.min_speed, self.max_speed),
         ]
 
     def is_out_of_bounds(self, y, x):
@@ -76,25 +82,8 @@ class Node:
     def __repr__(self):
         return f"Node({self.y}, {self.x}, {self.dir}, {self.speed}, {self.heatloss})"
 
-    # def print(self):
-    #     print(f"Node({self.y}, {self.x}, {self.dir}, {self.speed}, {self.heatloss}, {self.lines}, {self.history})")
-    #     for y, line in enumerate(self.lines):
-    #         for x, char in enumerate(line):
-    #             if (y, x, "N") in self.history:
-    #                 print("^", end="")
-    #             elif (y, x, "E") in self.history:
-    #                 print(">", end="")
-    #             elif (y, x, "S") in self.history:
-    #                 print("v", end="")
-    #             elif (y, x, "W") in self.history:
-    #                 print("<", end="")
-    #             else:
-    #                 print(char, end="")
-    #         print()
-    #     print()
 
-
-def part1(lines):
+def compute_heatloss(lines, min_speed, max_speed):
     height = len(lines)
     width = len(lines[0])
     board = {}
@@ -107,8 +96,8 @@ def part1(lines):
         (0, 0, "S", 1): 0
     }
     nodes = [
-        Node(0, 0, "E", 0, 0, board, height, width),
-        Node(0, 0, "S", 0, 0, board, height, width),
+        Node(0, 0, "E", 0, 0, board, height, width, min_speed, max_speed),
+        Node(0, 0, "S", 0, 0, board, height, width, min_speed, max_speed),
     ]
     while nodes:
 
@@ -126,18 +115,20 @@ def part1(lines):
 
         nodes = next_nodes
 
+    return min([value for (y, x, _, speed), value in heatlosses.items() if y == height - 1 and x == width - 1 and speed >= min_speed])
 
-    return min([value for (y, x, _, _), value in heatlosses.items() if y == height-1 and x == width-1])
+def part1(lines):
+    return compute_heatloss(lines, 1, 3)
 
 
 def part2(lines):
-    return 4
+    return compute_heatloss(lines, 4, 10)
 
 
 if __name__ == '__main__':
 
-    part = 1
-    expectedSampleResult = 102
+    part = 2
+    expectedSampleResult = 94
 
     part_func = part1 if part == 1 else part2
     if part_func(read_input_lines("sample.txt")) == expectedSampleResult:
