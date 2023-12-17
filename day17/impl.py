@@ -113,6 +113,8 @@ def part1(lines):
 
         for new_node in next_nodes:
             new_node_attributes = (new_node.y, new_node.x)
+            if len(finished_paths) > 0 and new_node.heatloss >= finished_paths[0].heatloss:
+                continue
             if new_node_attributes not in already_seen:
                 possible_paths.append(new_node)
                 already_seen[new_node_attributes] = new_node.heatloss
@@ -121,10 +123,12 @@ def part1(lines):
                 already_seen[new_node_attributes] = min(already_seen[new_node_attributes], new_node.heatloss)
         #print_possible_paths(possible_paths, lines)
         finished_paths += [p for p in possible_paths if p.finished()]
+        finished_paths.sort(key=lambda p: p.heatloss)
 
-    print(len(finished_paths))
+        print(f"Finished paths : {len(finished_paths)}")
+        if len(finished_paths) > 0:
+            print(f"Current best : {finished_paths[0].heatloss}")
 
-    finished_paths.sort(key=lambda p: p.heatloss)
     finished_paths[0].print()
     return finished_paths[0].heatloss #already_seen[(rows-1,cols-1)]
 
