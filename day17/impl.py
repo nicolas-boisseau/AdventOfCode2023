@@ -20,25 +20,26 @@ new_directions = {
 }
 
 class Node:
-    def __init__(self, y, x, dir, speed, heatloss, lines, history):
+    def __init__(self, y, x, dir, speed, heatloss, board, h, w):
         self.y = y
         self.x = x
         self.dir = dir
-        self.lines = lines
+        self.board = board
         self.speed = speed
         self.heatloss = heatloss
-        self.history = history + [(y, x, dir)]
+        self.h = h
+        self.w = w
 
     def forward(self):
         if self.speed < 3:
             new_y = self.y + directions[self.dir][0]
             new_x = self.x + directions[self.dir][1]
-            if self.is_out_of_bounds(new_y, new_x) or (new_y, new_x, self.dir) in self.history:
+            if self.is_out_of_bounds(new_y, new_x):
                 return []
             new_speed = self.speed + 1
-            new_heatloss = self.heatloss + int(self.lines[new_y][new_x])
+            new_heatloss = self.heatloss + self.board[(new_y, new_x)]
             return [
-                Node(new_y, new_x, self.dir, new_speed, new_heatloss, self.lines, self.history),
+                Node(new_y, new_x, self.dir, new_speed, new_heatloss, self.board, self.h, self.w),
             ]
         return []
 
@@ -47,94 +48,86 @@ class Node:
         new_dir = new_directions[self.dir][0]
         new_y = self.y + directions[new_dir][0]
         new_x = self.x + directions[new_dir][1]
-        if self.is_out_of_bounds(new_y, new_x) or (new_y, new_x, new_dir) in self.history:
+        if self.is_out_of_bounds(new_y, new_x):
             return []
         new_speed = 1
-        new_heatloss = self.heatloss + int(self.lines[new_y][new_x])
+        new_heatloss = self.heatloss + self.board[(new_y, new_x)]
         return [
-            Node(new_y, new_x, new_dir, new_speed, new_heatloss, self.lines, self.history),
+            Node(new_y, new_x, new_dir, new_speed, new_heatloss, self.board, self.h, self.w),
         ]
     def right(self):
         new_dir = new_directions[self.dir][1]
         new_y = self.y + directions[new_dir][0]
         new_x = self.x + directions[new_dir][1]
-        if self.is_out_of_bounds(new_y, new_x) or (new_y, new_x, new_dir) in self.history:
+        if self.is_out_of_bounds(new_y, new_x):
             return []
         new_speed = 1
-        new_heatloss = self.heatloss + int(self.lines[new_y][new_x])
+        new_heatloss = self.heatloss + self.board[(new_y, new_x)]
         return [
-            Node(new_y, new_x, new_dir, new_speed, new_heatloss, self.lines, self.history),
+            Node(new_y, new_x, new_dir, new_speed, new_heatloss, self.board, self.h, self.w),
         ]
 
     def is_out_of_bounds(self, y, x):
-        return y < 0 or y >= len(self.lines) or x < 0 or x >= len(self.lines[0])
+        return y < 0 or y >= self.h or x < 0 or x >= self.w
 
     def finished(self):
-        return self.y == len(self.lines) - 1 and self.x == len(self.lines[0]) - 1
+        return self.y == self.h - 1 and self.x == self.w - 1
 
     def __repr__(self):
-        return f"Node({self.y}, {self.x}, {self.dir}, {self.speed}, {self.heatloss}, {self.lines}, {self.history})"
+        return f"Node({self.y}, {self.x}, {self.dir}, {self.speed}, {self.heatloss})"
 
-    def print(self):
-        print(f"Node({self.y}, {self.x}, {self.dir}, {self.speed}, {self.heatloss}, {self.lines}, {self.history})")
-        for y, line in enumerate(self.lines):
-            for x, char in enumerate(line):
-                if (y, x, "N") in self.history:
-                    print("^", end="")
-                elif (y, x, "E") in self.history:
-                    print(">", end="")
-                elif (y, x, "S") in self.history:
-                    print("v", end="")
-                elif (y, x, "W") in self.history:
-                    print("<", end="")
-                else:
-                    print(char, end="")
-            print()
-        print()
+    # def print(self):
+    #     print(f"Node({self.y}, {self.x}, {self.dir}, {self.speed}, {self.heatloss}, {self.lines}, {self.history})")
+    #     for y, line in enumerate(self.lines):
+    #         for x, char in enumerate(line):
+    #             if (y, x, "N") in self.history:
+    #                 print("^", end="")
+    #             elif (y, x, "E") in self.history:
+    #                 print(">", end="")
+    #             elif (y, x, "S") in self.history:
+    #                 print("v", end="")
+    #             elif (y, x, "W") in self.history:
+    #                 print("<", end="")
+    #             else:
+    #                 print(char, end="")
+    #         print()
+    #     print()
 
 
 def part1(lines):
-    rows = len(lines)
-    cols = len(lines[0])
+    height = len(lines)
+    width = len(lines[0])
+    board = {}
+    for y, line in enumerate(lines):
+        for x, char in enumerate(line):
+            board[(y, x)] = int(char)
 
-    possible_paths = [
-        Node(0, 0, "E", 0, 0, lines, []),
-        Node(0, 0, "S", 0, 0, lines, [])
+    heatlosses = {
+        (0, 0, "E", 1): 0,
+        (0, 0, "S", 1): 0
+    }
+    nodes = [
+        Node(0, 0, "E", 0, 0, board, height, width),
+        Node(0, 0, "S", 0, 0, board, height, width),
     ]
-    finished_paths = []
-    already_seen = {}
-    while len(possible_paths) > 0:
-        current_path = possible_paths[0]
-        possible_paths = possible_paths[1:]
+    while nodes:
 
-        next_nodes = current_path.forward()
-        next_nodes += current_path.left()
-        next_nodes += current_path.right()
+        next_nodes = []
+        for n in nodes:
+            possible_nexts = n.forward()
+            possible_nexts += n.left()
+            possible_nexts += n.right()
 
-        for new_node in next_nodes:
-            new_node_attributes = (new_node.y, new_node.x)
-            if len(finished_paths) > 0 and new_node.heatloss >= finished_paths[0].heatloss:
-                continue
-            if new_node_attributes not in already_seen:
-                possible_paths.append(new_node)
-                already_seen[new_node_attributes] = new_node.heatloss
-            elif new_node.heatloss < already_seen[new_node_attributes]:
-                possible_paths.append(new_node)
-                already_seen[new_node_attributes] = min(already_seen[new_node_attributes], new_node.heatloss)
-        #print_possible_paths(possible_paths, lines)
-        finished_paths += [p for p in possible_paths if p.finished()]
-        finished_paths.sort(key=lambda p: p.heatloss)
+            for next in possible_nexts:
+                new_node_attributes = (next.y, next.x, next.dir, next.speed)
+                if new_node_attributes not in heatlosses or next.heatloss < heatlosses[new_node_attributes]:
+                    next_nodes.append(next)
+                    heatlosses[new_node_attributes] = next.heatloss
 
-        print(f"Finished paths : {len(finished_paths)}")
-        if len(finished_paths) > 0:
-            print(f"Current best : {finished_paths[0].heatloss}")
-
-    finished_paths[0].print()
-    return finished_paths[0].heatloss #already_seen[(rows-1,cols-1)]
+        nodes = next_nodes
 
 
-
-
+    return min([value for (y, x, _, _), value in heatlosses.items() if y == height-1 and x == width-1])
 
 
 def part2(lines):
