@@ -5,11 +5,18 @@ from common.common import download_input_if_not_exists, post_answer, capture, ca
 download_input_if_not_exists(2023)
 
 
-directions2 = {
+directions = {
     "U": (-1, 0),
     "R": (0, 1),
     "D": (1, 0),
     "L": (0, -1),
+}
+
+directions2 = {
+    "0": "R",
+    "1": "D",
+    "2": "L",
+    "3": "U",
 }
 
 
@@ -30,13 +37,13 @@ def fill_inside(grid, instructions):
     first_instr = instructions[0]
     # look at right
     if first_instr[0] == "U":
-        propagate_non_recursive(grid, directions2["U"][0], directions2["U"][1]+1)
+        propagate_non_recursive(grid, directions["U"][0], directions["U"][1] + 1)
     elif first_instr[0] == "D":
-        propagate_non_recursive(grid, directions2["D"][0], directions2["D"][1]-1)
+        propagate_non_recursive(grid, directions["D"][0], directions["D"][1] - 1)
     elif first_instr[0] == "L":
-        propagate_non_recursive(grid, directions2["L"][0]-1, directions2["L"][1])
+        propagate_non_recursive(grid, directions["L"][0] - 1, directions["L"][1])
     elif first_instr[0] == "R":
-        propagate_non_recursive(grid, directions2["R"][0]+1, directions2["R"][1])
+        propagate_non_recursive(grid, directions["R"][0] + 1, directions["R"][1])
 
 def propagate_non_recursive(grid, x, y):
     minY = min([p[0] for p in grid])
@@ -67,34 +74,71 @@ def propagate_non_recursive(grid, x, y):
             grid[(cur_y, cur_x)] = 1
     return grid
 
-
-def part1(lines):
-    instructions = []
-    grid = {}
-    for line in lines:
-        splitted = line.split(" ")
-        instructions.append((splitted[0], int(splitted[1]), splitted[2]))
+def draw(grid, instructions, fill=True):
     x = y = 0
     grid[(y, x)] = 1
     for instr in instructions:
-        direction = directions2[instr[0]]
+        direction = directions[instr[0]]
         for i in range(instr[1]):
             y += direction[0]
             x += direction[1]
             if (y, x) not in grid:
                 grid[(y, x)] = 1
 
-    #print_grid(grid)
-
-    fill_inside(grid, instructions)
-
-    #print()
-    #print_grid(grid)
+    print(f"before fill: {len(grid)}")
+    if fill:
+        fill_inside(grid, instructions)
 
     return len(grid)
 
+# https://rosettacode.org/wiki/Shoelace_formula_for_polygonal_area#Python
+def area_by_shoelace(x, y):
+    "Assumes x,y points go around the polygon in one direction"
+    return abs( sum(i * j for i, j in zip(x,             y[1:] + y[:1]))
+               -sum(i * j for i, j in zip(x[1:] + x[:1], y            ))) / 2
+
+def draw2(instructions):
+    x = y = 0
+    points = [(x, y)]
+    for instr in instructions:
+        direction = directions[instr[0]]
+        y = y + (instr[1] * direction[0])
+        x = x + (instr[1] * direction[1])
+        points.append((x, y))
+
+    xx, yy = zip(*points)
+    return int(area_by_shoelace(xx, yy))
+
+
+
+def part1(lines):
+    instructions = []
+    grid = {}
+    for line in lines:
+        splitted = line.split(" ")
+
+        direction = splitted[0]
+        distance = int(splitted[1])
+
+        instructions.append((direction, distance))
+
+    #return draw(grid, instructions)
+    return draw2(instructions)
+
+
 def part2(lines):
-    return 4
+    instructions = []
+    for line in lines:
+        splitted = line.split(" ")
+
+        hexa = splitted[2]
+
+        direction = directions2[hexa[7]]
+        distance = int(hexa[2:7], 16)
+
+        instructions.append((direction, distance))
+
+    return draw2(instructions)
 
 
 if __name__ == '__main__':
