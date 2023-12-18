@@ -94,20 +94,24 @@ def draw(grid, instructions, fill=True):
 # https://rosettacode.org/wiki/Shoelace_formula_for_polygonal_area#Python
 def area_by_shoelace(x, y):
     "Assumes x,y points go around the polygon in one direction"
-    return abs( sum(i * j for i, j in zip(x,             y[1:] + y[:1]))
-               -sum(i * j for i, j in zip(x[1:] + x[:1], y            ))) / 2
+    return abs( sum(i * j for i, j in zip(x, y[1:] + y[:1]))
+               -sum(i * j for i, j in zip(x[1:] + x[:1], y))) / 2
 
 def draw2(instructions):
     x = y = 0
     points = [(x, y)]
+    total_distance = 0
     for instr in instructions:
         direction = directions[instr[0]]
-        y = y + (instr[1] * direction[0])
-        x = x + (instr[1] * direction[1])
+        dy = (instr[1] * direction[0])
+        dx = (instr[1] * direction[1])
+        total_distance += abs(dy + dx)
+        y = y + dy
+        x = x + dx
         points.append((x, y))
 
     xx, yy = zip(*points)
-    return int(area_by_shoelace(xx, yy))
+    return int(area_by_shoelace(xx, yy) + total_distance / 2) + 1
 
 
 
