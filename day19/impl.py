@@ -64,16 +64,21 @@ def part1(lines):
     print(workflows)
     print(parts)
 
-    for part in parts[0:1]:
+    total = 0
+    for part in parts:
         current_workflow_name = "in"
         while current_workflow_name not in ["A", "R"]:
             current_workflow = [w for w in workflows if w[0] == current_workflow_name][0]
             current_workflow_name = execute_workflow(current_workflow, part)
             print(current_workflow_name)
+        if current_workflow_name == "A":
+            total += sum(p[1] for p in part)
 
 
 
-    return 0
+
+
+    return total
 
 def part2(lines):
     return 4
@@ -82,7 +87,7 @@ def part2(lines):
 if __name__ == '__main__':
 
     part = 1
-    expectedSampleResult = -1
+    expectedSampleResult = 19114
 
     part_func = part1 if part == 1 else part2
     if part_func(read_input_lines("sample.txt")) == expectedSampleResult:
