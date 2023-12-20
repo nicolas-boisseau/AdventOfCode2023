@@ -149,36 +149,34 @@ def part2(lines):
                     bounds_by_path[i][op_part] = (op_value, bounds_by_path[i][op_part][1])
 
         print(f"bounds_by_path[{i}]= {bounds_by_path[i]}")
-
+    print()
     # merge common bounds in bounds_by_path[i]
-    new_bounds_by_path = defaultdict(dict)
-    new_bounds_by_path[0] = bounds_by_path[0]
-    for j in bounds_by_path.keys():
-        skip = False
-        if j == 0:
-            continue
-        for i in new_bounds_by_path.keys():
-            if new_bounds_by_path[i] == bounds_by_path[j]:
-                skip = True
-                break
+    for i in bounds_by_path.keys():
+        for j in bounds_by_path.keys():
+            if i == j:
+                continue
+            for op in bounds_by_path[i].keys():
+                if op not in bounds_by_path[j]:
+                    continue
+                if bounds_by_path[i][op][0] > bounds_by_path[j][op][0]:
+                    bounds_by_path[i][op] = (bounds_by_path[i][op][0], bounds_by_path[j][op][1])
+                if bounds_by_path[i][op][1] < bounds_by_path[j][op][1]:
+                    bounds_by_path[i][op] = (bounds_by_path[j][op][0], bounds_by_path[i][op][1])
 
-        if skip:
-            continue
-        new_bounds_by_path[j] = bounds_by_path[j]
-        print(f"new_bounds_by_path[{j}]= {new_bounds_by_path[j]}")
 
-    total = 1
-    for i in new_bounds_by_path.keys():
-        total_mult = 1
-        for j in new_bounds_by_path[i].keys():
-            to_multiply = (new_bounds_by_path[i][j][1] - new_bounds_by_path[i][j][0] + 1)
-            total_mult *= to_multiply
-        total += total_mult
 
-    print(total)
+    print(bounds_by_path)
 
+    total = 0
+    for i in bounds_by_path.keys():
+        sub_total = 1
+        for op in bounds_by_path[i].keys():
+            sub_total *= bounds_by_path[i][op][1] - bounds_by_path[i][op][0] + 1
+        total += sub_total
     return total
 
+def is_contained_in_bounds(bounds, values):
+    if values[]
 
 if __name__ == '__main__':
 
