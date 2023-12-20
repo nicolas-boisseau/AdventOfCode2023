@@ -1,4 +1,5 @@
 import os.path
+from collections import defaultdict
 
 from common.common import download_input_if_not_exists, post_answer, capture, capture_all, read_input_lines
 
@@ -16,6 +17,7 @@ def step_func(x, x_value, step_op_part, step_op_op, step_op_value, output):
 def interpret_input(lines):
     workflows = []
     parts = []
+    g = defaultdict(list)
     is_workflow = True
     for line in lines:
         if line == "":
@@ -24,14 +26,17 @@ def interpret_input(lines):
         if is_workflow:
             values = capture(r"([a-z]+)\{([a-zA-Z0-9<>=:,]+)\}", line)
             name = values[0]
+            g[name] = []
             steps_raw = values[1].split(",")
             steps = []
             for i in range(len(steps_raw)):
                 step_raw = steps_raw[i].split(":")
                 if len(step_raw) == 1:
                     step = ("direct_output", step_raw[0])
+                    g[name].append(("1=1", step_raw[0]))
                 else:
                     step_op = step_raw[0]
+                    g[name].append((step_op, step_raw[1]))
                     step_op_values = capture(r"([a-z]+)([<>])([0-9]+)", step_op)
                     step_op_part = step_op_values[0]
                     step_op_op = step_op_values[1]
@@ -46,7 +51,7 @@ def interpret_input(lines):
             for values in all_values:
                 part.append((values[0], int(values[1])))
             parts.append(part)
-    return workflows, parts
+    return workflows, parts, g
 
 def execute_workflow(workflow, part):
     for step in workflow[1]:
@@ -73,15 +78,106 @@ def part1(lines):
             print(current_workflow_name)
         if current_workflow_name == "A":
             total += sum(p[1] for p in part)
-
-
-
-
-
     return total
 
+
+def getAllPaths(g, current, end, visited, path, all_paths):
+    # Mark the current node as visited and store in path
+    visited[current] = True
+    path.append(current)
+
+    # If current vertex is same as destination, then print
+    # current path[]
+    if current == end:
+        all_paths.append(path.copy())
+    else:
+        # If current vertex is not destination
+        # Recur for all the vertices adjacent to this vertex
+        for (op, i) in g[current]:
+            if i not in visited or not visited[i]:
+                getAllPaths(g, i, end, visited, path, all_paths)
+
+    # Remove current vertex from path[] and mark it as unvisited
+    path.pop()
+    visited[current] = False
+
+    return all_paths
+
 def part2(lines):
-    return 4
+    workflows, parts, g = interpret_input(lines)
+    print(workflows)
+    print(parts)
+    print(g)
+    print()
+
+    all_paths = getAllPaths(g, "in", "A", defaultdict(bool), [], [])
+    print(all_paths)
+
+
+
+    ops_by_path = defaultdict(list)
+    for i, path in enumerate(all_paths): # try 1st
+        for j, step in enumerate(path):
+            if step == "A":
+                break
+            op = [op for (op, next) in g[step] if next == path[j+1]][0]
+            ops_by_path[i].append(op)
+
+    print(ops_by_path)
+
+    bounds_by_path = defaultdict(dict)
+    for i in ops_by_path.keys():
+        ops = ops_by_path[i]
+        bounds_by_path[i] = {
+            "x": (1, 4000),
+            "m": (1, 4000),
+            "a": (1, 4000),
+            "s": (1, 4000),
+        }
+        for op in ops:
+            if op == "1=1":
+                continue
+            op_values = capture(r"([a-z]+)([<>])([0-9]+)", op)
+            op_part = op_values[0]
+            op_op = op_values[1]
+            op_value = int(op_values[2])
+            if op_op == "<":
+                if op_value < bounds_by_path[i][op_part][1]:
+                    bounds_by_path[i][op_part] = (bounds_by_path[i][op_part][0], op_value)
+            else:
+                if op_value > bounds_by_path[i][op_part][0]:
+                    bounds_by_path[i][op_part] = (op_value, bounds_by_path[i][op_part][1])
+
+        print(f"bounds_by_path[{i}]= {bounds_by_path[i]}")
+
+    # merge common bounds in bounds_by_path[i]
+    new_bounds_by_path = defaultdict(dict)
+    new_bounds_by_path[0] = bounds_by_path[0]
+    for j in bounds_by_path.keys():
+        skip = False
+        if j == 0:
+            continue
+        for i in new_bounds_by_path.keys():
+            if new_bounds_by_path[i] == bounds_by_path[j]:
+                skip = True
+                break
+
+        if skip:
+            continue
+        new_bounds_by_path[j] = bounds_by_path[j]
+        print(f"new_bounds_by_path[{j}]= {new_bounds_by_path[j]}")
+
+    total = 1
+    for i in new_bounds_by_path.keys():
+        total_mult = 1
+        for j in new_bounds_by_path[i].keys():
+            to_multiply = (new_bounds_by_path[i][j][1] - new_bounds_by_path[i][j][0] + 1)
+            total_mult *= to_multiply
+        total += total_mult
+
+    print(total)
+
+    return total
 
 
 if __name__ == '__main__':
