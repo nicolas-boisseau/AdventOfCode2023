@@ -150,33 +150,98 @@ def part2(lines):
 
         print(f"bounds_by_path[{i}]= {bounds_by_path[i]}")
     print()
-    # merge common bounds in bounds_by_path[i]
-    for i in bounds_by_path.keys():
-        for j in bounds_by_path.keys():
-            if i == j:
-                continue
-            for op in bounds_by_path[i].keys():
-                if op not in bounds_by_path[j]:
-                    continue
-                if bounds_by_path[i][op][0] > bounds_by_path[j][op][0]:
-                    bounds_by_path[i][op] = (bounds_by_path[i][op][0], bounds_by_path[j][op][1])
-                if bounds_by_path[i][op][1] < bounds_by_path[j][op][1]:
-                    bounds_by_path[i][op] = (bounds_by_path[j][op][0], bounds_by_path[i][op][1])
-
-
 
     print(bounds_by_path)
 
+    #bounds_by_path1 = {'x': (2662, 4000), 'm': (1, 4000), 'a': (1, 2006), 's': (1, 1351)}
+    #bounds_by_path2 = {'x': (1, 4000), 'm': (2090, 4000), 'a': (1, 4000), 's': (1, 1351)}
+
+    intersections = find_intersection(bounds_by_path[2], bounds_by_path[3])
+    for i, inter in enumerate(intersections):
+        print(f"intersections[{i}] = {intersections[i]}")
+
     total = 0
+    already_counted = []
     for i in bounds_by_path.keys():
-        sub_total = 1
-        for op in bounds_by_path[i].keys():
-            sub_total *= bounds_by_path[i][op][1] - bounds_by_path[i][op][0] + 1
+        sub_total = score(bounds_by_path[i])
+
+        # let's check intersections :
+        for j in range(i+1, len(bounds_by_path.keys())):
+            if i == j:
+                continue
+            intersections = find_intersection(bounds_by_path[i], bounds_by_path[j])
+            for inter in intersections:
+                if inter in already_counted and len(intersections) == 1:
+                    sub_total -= score(inter)
+                else:
+                    already_counted.append(inter)
+
         total += sub_total
     return total
 
-def is_contained_in_bounds(bounds, values):
-    if values[]
+def score(bound):
+    sub_total = 1
+    for op in bound.keys():
+        sub_total *= bound[op][1] - bound[op][0] + 1
+    return sub_total
+
+def find_intersection(bounds1, bounds2):
+    intersections = []
+
+    if is_subset(bounds1, bounds2):
+        intersections.append(bounds1)
+        return intersections
+    elif is_subset(bounds2, bounds1):
+        intersections.append(bounds2)
+        return intersections
+
+    if has_intersection(bounds1, bounds2):
+        for combination in get_combinations():
+            if has_range_intersection(bounds1, bounds2, combination):
+                intersection = get_intersection(bounds1, bounds2, combination)
+                intersections.append(intersection)
+            else:
+                intersections.append(bounds1)
+                intersections.append(bounds2)
+    else:
+        intersections.append(bounds1)
+        intersections.append(bounds2)
+
+    return intersections
+
+def is_subset(bounds1, bounds2):
+    for key in bounds1:
+        if bounds1[key][0] < bounds2[key][0] or bounds1[key][1] > bounds2[key][1]:
+            return False
+    return True
+
+def has_intersection(bounds1, bounds2):
+    for key in bounds1:
+        min1 = bounds1[key][0]
+        max1 = bounds1[key][1]
+        min2 = bounds2[key][0]
+        max2 = bounds2[key][1]
+        if max1 >= min2 and min1 <= max2:
+            return True
+    return False
+
+def has_range_intersection(bounds1, bounds2, combination):
+    for key in combination:
+        if bounds1[key][1] < bounds2[key][0] or bounds1[key][0] > bounds2[key][1]:
+            return False
+    return True
+
+def get_intersection(bounds1, bounds2, combination):
+    intersection = {}
+    for key in combination:
+        intersection[key] = (max(bounds1[key][0], bounds2[key][0]), min(bounds1[key][1], bounds2[key][1]))
+    return intersection
+
+def get_combinations():
+    return [
+        ['x', 'm', 's', 'a'],
+    ]
+
 
 if __name__ == '__main__':
 
