@@ -1,19 +1,20 @@
 import os.path
+from collections import defaultdict
 
 from common.common import download_input_if_not_exists, post_answer, capture, capture_all, read_input_lines
 
 download_input_if_not_exists(2023)
 
 def extract(lines):
-    g = {}
+    g = defaultdict(bool)
     s = ()
     for y, line in enumerate(lines):
         for x, c in enumerate(line):
             if c == ".":
-                g[(y, x)] = False
+                g[(y, x, 0, 0)] = False
             elif c == "S":
-                s = (y, x)
-                g[(y, x)] = False
+                s = (y, x, 0, 0)
+                g[(y, x, 0, 0)] = False
     return g, s
 
 def print_grid(lines, g, s):
@@ -33,10 +34,10 @@ def part1(lines, max_steps=6):
         next_steps = []
         while steps:
             step = steps.pop(0)
-            up = (step[0]-1, step[1])
-            down = (step[0]+1, step[1])
-            left = (step[0], step[1]-1)
-            right = (step[0], step[1]+1)
+            up = (step[0]-1, step[1], step[2], step[3])
+            down = (step[0]+1, step[1], step[2], step[3])
+            left = (step[0], step[1]-1, step[2], step[3])
+            right = (step[0], step[1]+1, step[2], step[3])
 
             if up in g and not g[up]:
                 g[up] = True
@@ -54,7 +55,7 @@ def part1(lines, max_steps=6):
         # reset grid
         for k in g:
             g[k] = False
-        print_grid(lines, g, s)
+        #print_grid(lines, g, s)
 
     return len(steps)
 
@@ -65,31 +66,31 @@ def part2(lines, max_steps=6):
         next_steps = []
         while steps:
             step = steps.pop(0)
-            up = (step[0] - 1, step[1])
-            down = (step[0] + 1, step[1])
-            left = (step[0], step[1] - 1)
-            right = (step[0], step[1] + 1)
+            up = (step[0] - 1, step[1], step[2], step[3])
+            down = (step[0] + 1, step[1], step[2], step[3])
+            left = (step[0], step[1] - 1, step[2], step[3])
+            right = (step[0], step[1] + 1, step[2], step[3])
 
             # fix out of range pos
             if up[0]==-1:
-                up = (len(lines)-1, up[1])
+                up = (len(lines)-1, up[1], up[2]-1, up[3])
             if down[0]==len(lines):
-                down = (0, down[1])
+                down = (0, down[1], down[2]+1, down[3])
             if left[1]==-1:
-                left = (left[0], len(lines[0])-1)
+                left = (left[0], len(lines[0])-1, left[2], left[3]-1)
             if right[1]==len(lines[0]):
-                right = (right[0], 0)
+                right = (right[0], 0, right[2], right[3]+1)
 
-            if up in g and not g[up]:
+            if (up[0], up[1], 0, 0) in g and not g[up]:
                 g[up] = True
                 next_steps.append(up)
-            if down in g and not g[down]:
+            if (down[0], down[1], 0, 0) in g and not g[down]:
                 g[down] = True
                 next_steps.append(down)
-            if left in g and not g[left]:
+            if (left[0], left[1], 0, 0) in g and not g[left]:
                 g[left] = True
                 next_steps.append(left)
-            if right in g and not g[right]:
+            if (right[0], right[1], 0, 0) in g and not g[right]:
                 g[right] = True
                 next_steps.append(right)
         steps = next_steps
