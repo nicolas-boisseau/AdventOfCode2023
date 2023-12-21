@@ -37,6 +37,7 @@ def part1(lines, max_steps=6):
             down = (step[0]+1, step[1])
             left = (step[0], step[1]-1)
             right = (step[0], step[1]+1)
+
             if up in g and not g[up]:
                 g[up] = True
                 next_steps.append(up)
@@ -57,8 +58,47 @@ def part1(lines, max_steps=6):
 
     return len(steps)
 
-def part2(lines):
-    return 4
+def part2(lines, max_steps=6):
+    g, s = extract(lines)
+    steps = [s]
+    for i in range(0, max_steps):
+        next_steps = []
+        while steps:
+            step = steps.pop(0)
+            up = (step[0] - 1, step[1])
+            down = (step[0] + 1, step[1])
+            left = (step[0], step[1] - 1)
+            right = (step[0], step[1] + 1)
+
+            # fix out of range pos
+            if up[0]==-1:
+                up = (len(lines)-1, up[1])
+            if down[0]==len(lines):
+                down = (0, down[1])
+            if left[1]==-1:
+                left = (left[0], len(lines[0])-1)
+            if right[1]==len(lines[0]):
+                right = (right[0], 0)
+
+            if up in g and not g[up]:
+                g[up] = True
+                next_steps.append(up)
+            if down in g and not g[down]:
+                g[down] = True
+                next_steps.append(down)
+            if left in g and not g[left]:
+                g[left] = True
+                next_steps.append(left)
+            if right in g and not g[right]:
+                g[right] = True
+                next_steps.append(right)
+        steps = next_steps
+        # reset grid
+        for k in g:
+            g[k] = False
+        #print_grid(lines, g, s)
+
+    return len(steps)
 
 
 if __name__ == '__main__':
