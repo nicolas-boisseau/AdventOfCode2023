@@ -59,7 +59,27 @@ def part1(lines, max_steps=6):
 
     return len(steps)
 
-def part2(lines, max_steps=6):
+def part2(lines, max_steps):
+
+    if max_steps <= 50:
+        return part2_internal(lines, max_steps)
+    x = max_steps
+    x1 = 10
+    y1 = part2_internal(lines, x1)
+    x2 = 25
+    y2 = part2_internal(lines, x2)
+    x3 = 50
+    y3 = part2_internal(lines, x3)
+
+    # quadratic curve equation:
+    y = ((x - x2) * (x - x3)) / ((x1 - x2) * (x1 - x3)) * y1 + ((x - x1) * (x - x3)) / ((x2 - x1) * (x2 - x3)) * y2 + (
+                (x - x1) * (x - x2)) / ((x3 - x1) * (x3 - x2)) * y3
+
+    return int(y)
+
+
+
+def part2_internal(lines, max_steps=6):
     g, s = extract(lines)
     steps = [s]
     for i in range(0, max_steps):

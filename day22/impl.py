@@ -8,13 +8,13 @@ download_input_if_not_exists(2023)
 
 def extract(lines):
     cubes = []
-    for i, line in enumerate(lines):
+    for id, line in enumerate(lines):
         cube_positions = line.split("~")
         cube_pos_1 = cube_positions[0].split(",")
         cube_pos_2 = cube_positions[1].split(",")
         start = (int(cube_pos_1[0]), int(cube_pos_1[1]), int(cube_pos_1[2]))
         end = (int(cube_pos_2[0]), int(cube_pos_2[1]), int(cube_pos_2[2]))
-        cube = (start, end)
+        cube = (start, end, id)
         # for z in range(start[2], end[2]+1):
         #     for y in range(start[1], end[1]+1):
         #         for x in range(start[0], end[0]+1):
@@ -22,6 +22,16 @@ def extract(lines):
 
         cubes.append(cube)
     return cubes
+
+names = {
+    0: "A",
+    1: "B",
+    2: "C",
+    3: "D",
+    4: "E",
+    5: "F",
+    6: "G"
+}
 
 def intersect_another_cube(cube, other_cube):
     for z in range(cube[0][2], cube[1][2]+1):
@@ -38,54 +48,80 @@ def print_from_y_perspective(cubes):
     maxX = max([max(max(cube[0][0], cube[1][0]) for cube in cubes)])
     maxZ = max([max(max(cube[0][2], cube[1][2]) for cube in cubes)])
 
-    for z in range(maxZ+1):
-        for y in range(maxX+1):
+    for z in range(maxZ, -1, -1):
+        for x in range(maxX+1):
+            cube_here = []
             for i, cube in enumerate(cubes):
-                if cube[0][1] <= y <= cube[1][1] and cube[0][2] <= z <= cube[1][2]:
-                    print(i, end="")
-                    break
-            else:
+                if cube[0][0] <= x <= cube[1][0] and cube[0][2] <= z <= cube[1][2]:
+                    cube_here.append(names[cube[2]])
+            if len(cube_here) == 0:
                 print(".", end="")
+            else:
+                print(cube_here[0] if len(cube_here)==1 else "?", end="")
         print()
     print()
 
+def print_from_x_perspective(cubes):
+    maxY = max([max(max(cube[0][1], cube[1][1]) for cube in cubes)])
+    maxZ = max([max(max(cube[0][2], cube[1][2]) for cube in cubes)])
+
+    for z in range(maxZ, -1, -1):
+        for y in range(maxY+1):
+            cube_here = []
+            for i, cube in enumerate(cubes):
+                if cube[0][1] <= y <= cube[1][1] and cube[0][2] <= z <= cube[1][2]:
+                    cube_here.append(names[cube[2]])
+            if len(cube_here) == 0:
+                print(".", end="")
+            else:
+                print(cube_here[0] if len(cube_here) == 1 else "?", end="")
+        print()
+    print()
+
+
+
 def part1(lines):
     cubes = extract(lines)
-    cubes_q = heapq.heapify(cubes, key=lambda cube: min(cube[0][2], cube[1][2]))
+    cubes = sorted(cubes, key=lambda c: c[0][2])
 
     # lets let cubes fall on Z axis
-    has_not_moved = defaultdict(bool)
-    final_cubes = []
     print_from_y_perspective(cubes)
-    while all([not has_not_moved[cube] for cube in cubes]):
+    print_from_x_perspective(cubes)
 
-        next_cube = heapq.heappop(cubes_q)
+    nexts = cubes.copy()
+    while len(nexts):
+
+        current_cube = nexts.pop()
 
         # check if cube can fall
-        if next_cube[0][2] <= 1:
+        if current_cube[0][2] <= 1 or current_cube[1][2] <= 1:
             # cube already on the ground
-            has_not_moved[next_cube] = True
-            final_cubes.append(next_cube)
             continue
 
         # check if cube can fall
         can_fall = True
         while can_fall:
-            next_cube[0][2] -= 1
-            next_cube[1][2] -= 1
+            current_cube_p1 = current_cube[0]
+            current_cube_p2 = current_cube[1]
+            current_cube_p1 = (current_cube_p1[0], current_cube_p1[1], current_cube_p1[2]-1)
+            current_cube_p2 = (current_cube_p2[0], current_cube_p2[1], current_cube_p2[2]-1)
             for other_cube in cubes:
-                if intersect_another_cube(next_cube, other_cube):
+                if intersect_another_cube(current_cube, other_cube):
                     can_fall = False
                     break
             if can_fall:
-                has_not_moved[next_cube] = False
-            else:
-                next_cube[0][2] += 1
-                next_cube[1][2] += 1
-                has_not_moved[next_cube] = True
-                final_cubes.append(next_cube)
+                current_cube = (current_cube_p1, current_cube_p2, current_cube[2])
+                print("after 1 fall :")
+                print_from_y_perspective(cubes)
+                print_from_x_perspective(cubes)
 
-    print_from_y_perspective(final_cubes)
+        # replace cube in cubes
+        cubes = [cube if cube[2] != current_cube[2] else current_cube for cube in cubes]
+
+
+    print("FINAL :")
+    print_from_y_perspective(cubes)
+    print_from_x_perspective(cubes)
 
 
 
