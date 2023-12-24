@@ -12,18 +12,23 @@ def extract(lines):
         cube_positions = line.split("~")
         cube_pos_1 = cube_positions[0].split(",")
         cube_pos_2 = cube_positions[1].split(",")
-        start = (int(cube_pos_1[0]), int(cube_pos_1[1]), int(cube_pos_1[2]))
-        end = (int(cube_pos_2[0]), int(cube_pos_2[1]), int(cube_pos_2[2]))
-        cube = (start, end, id)
-        # for z in range(start[2], end[2]+1):
-        #     for y in range(start[1], end[1]+1):
-        #         for x in range(start[0], end[0]+1):
-        #             cube[(x, y, z)] = True
+        x1, y1, z1 = tuple(map(int, cube_pos_1))
+        x2, y2, z2 = tuple(map(int, cube_pos_2))
+        cube = ({}, id)
+        if z2 < z1:
+            x1, y1, z1, x2, y2, z2 = x2, y2, z2, x1, y1, z1
+        for z in range(z1, z2+1):
+            for y in range(y1, y2+1):
+                for x in range(x1, x2+1):
+                    cube[0][(x, y, z)] = True
 
         cubes.append(cube)
-    return cubes
 
-names = {
+    return sorted(cubes, key=lambda c: min_Z(c))
+
+
+names = defaultdict(str)
+names.update({
     0: "A",
     1: "B",
     2: "C",
@@ -31,29 +36,39 @@ names = {
     4: "E",
     5: "F",
     6: "G"
-}
+})
 
 def intersect_another_cube(cube, other_cube):
-    for z in range(cube[0][2], cube[1][2]+1):
-        for y in range(cube[0][1], cube[1][1]+1):
-            for x in range(cube[0][0], cube[1][0]+1):
-                for z2 in range(other_cube[0][2], other_cube[1][2]+1):
-                    for y2 in range(other_cube[0][1], other_cube[1][1]+1):
-                        for x2 in range(other_cube[0][0], other_cube[1][0]+1):
-                            if x == x2 and y == y2 and z == z2:
-                                return True
-    return False
+    return any([pos in other_cube[0] for pos in cube[0]])
+
+def min_Z(cube):
+    return min([zz for (xx, yy, zz) in cube[0].keys()])
+
+def max_Z(cube):
+    return max([zz for (xx, yy, zz) in cube[0].keys()])
+
+def min_X(cube):
+    return min([xx for (xx, yy, zz) in cube[0].keys()])
+
+def max_X(cube):
+    return max([xx for (xx, yy, zz) in cube[0].keys()])
+
+def min_Y(cube):
+    return min([yy for (xx, yy, zz) in cube[0].keys()])
+
+def max_Y(cube):
+    return max([yy for (xx, yy, zz) in cube[0].keys()])
 
 def print_from_y_perspective(cubes):
-    maxX = max([max(max(cube[0][0], cube[1][0]) for cube in cubes)])
-    maxZ = max([max(max(cube[0][2], cube[1][2]) for cube in cubes)])
+    maxX = max([max(max_X(cube) for cube in cubes)])
+    maxZ = max([max(max_Z(cube) for cube in cubes)])
 
     for z in range(maxZ, -1, -1):
         for x in range(maxX+1):
             cube_here = []
             for i, cube in enumerate(cubes):
-                if cube[0][0] <= x <= cube[1][0] and cube[0][2] <= z <= cube[1][2]:
-                    cube_here.append(names[cube[2]])
+                if (x, z) in [(xx, zz) for xx,yy,zz in cube[0].keys()]:
+                    cube_here.append(names[cube[1]])
             if len(cube_here) == 0:
                 print(".", end="")
             else:
@@ -62,15 +77,15 @@ def print_from_y_perspective(cubes):
     print()
 
 def print_from_x_perspective(cubes):
-    maxY = max([max(max(cube[0][1], cube[1][1]) for cube in cubes)])
-    maxZ = max([max(max(cube[0][2], cube[1][2]) for cube in cubes)])
+    maxY = max([max(max_Y(cube) for cube in cubes)])
+    maxZ = max([max(max_Z(cube) for cube in cubes)])
 
     for z in range(maxZ, -1, -1):
         for y in range(maxY+1):
             cube_here = []
             for i, cube in enumerate(cubes):
-                if cube[0][1] <= y <= cube[1][1] and cube[0][2] <= z <= cube[1][2]:
-                    cube_here.append(names[cube[2]])
+                if (y, z) in [(yy, zz) for xx,yy,zz in cube[0].keys()]:
+                    cube_here.append(names[cube[1]])
             if len(cube_here) == 0:
                 print(".", end="")
             else:
@@ -78,53 +93,79 @@ def print_from_x_perspective(cubes):
         print()
     print()
 
+supporting = defaultdict(list)
+supported_by = defaultdict(list)
 
+def fall(cubes, debug=False):
+    global supporting, supported_by
 
-def part1(lines):
-    cubes = extract(lines)
-    cubes = sorted(cubes, key=lambda c: c[0][2])
-
-    # lets let cubes fall on Z axis
-    print_from_y_perspective(cubes)
-    print_from_x_perspective(cubes)
-
-    nexts = cubes.copy()
-    while len(nexts):
-
-        current_cube = nexts.pop()
-
-        # check if cube can fall
-        if current_cube[0][2] <= 1 or current_cube[1][2] <= 1:
-            # cube already on the ground
-            continue
+    new_cubes = []
+    while cubes:
+        current_cube = cubes.pop(0)
+        if debug:
+            print(f"current_cube = {names[current_cube[1]]}")
 
         # check if cube can fall
         can_fall = True
         while can_fall:
-            current_cube_p1 = current_cube[0]
-            current_cube_p2 = current_cube[1]
-            current_cube_p1 = (current_cube_p1[0], current_cube_p1[1], current_cube_p1[2]-1)
-            current_cube_p2 = (current_cube_p2[0], current_cube_p2[1], current_cube_p2[2]-1)
-            for other_cube in cubes:
-                if intersect_another_cube(current_cube, other_cube):
+            if min_Z(current_cube) <= 1:
+                # cube already on the ground
+                break
+
+            new_current_cube_moins_1_Z = ({(x,y,z-1):v for (x,y,z), v in current_cube[0].items()}, current_cube[1])
+
+            for other_cube in new_cubes:
+                if intersect_another_cube(new_current_cube_moins_1_Z, other_cube):
                     can_fall = False
-                    break
+                    if current_cube[1] not in supporting[other_cube[1]]:
+                        supporting[other_cube[1]].append(current_cube[1])
+
+                    if other_cube[1] not in supported_by[current_cube[1]]:
+                        supported_by[current_cube[1]].append(other_cube[1])
             if can_fall:
-                current_cube = (current_cube_p1, current_cube_p2, current_cube[2])
-                print("after 1 fall :")
-                print_from_y_perspective(cubes)
-                print_from_x_perspective(cubes)
+                if debug:
+                    print(f"Cube {names[current_cube[1]]} falling -1 !")
+                current_cube = new_current_cube_moins_1_Z
 
         # replace cube in cubes
-        cubes = [cube if cube[2] != current_cube[2] else current_cube for cube in cubes]
+        new_cubes.append(current_cube)
 
 
-    print("FINAL :")
-    print_from_y_perspective(cubes)
-    print_from_x_perspective(cubes)
+    return new_cubes
 
+def part1(lines, debug=False):
+    global supporting, supported_by
 
+    cubes = extract(lines)
+    if debug:
+        print_from_y_perspective(cubes)
+        print_from_x_perspective(cubes)
 
+    cubes = fall(cubes, debug)
+
+    print("After falling :")
+    if debug:
+        print_from_y_perspective(cubes)
+        print_from_x_perspective(cubes)
+
+    print(f"supporting = {supporting}")
+    print(f"supported_by = {supported_by}")
+
+    removable = {}
+    for cube in cubes:
+        blocks, id = cube
+        if len(supporting[id]) == 0:
+            removable[id] = True
+            continue
+        else:
+            if all([len(supported_by[supporting_]) > 1 for supporting_ in supporting[id]]):
+                removable[id] = True
+                continue
+
+    removable_str = [ f"{id} ({names[id]})" for id in removable.keys()]
+    print(f"removable = {removable_str}")
+
+    return len(removable)
 
 
 
