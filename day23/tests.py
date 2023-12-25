@@ -7,16 +7,15 @@ from impl import part1, part2
 class AdventOfCodeTests(unittest.TestCase):
 
     def test_part1_sample(self):
-        self.assertEqual(5, part1(read_input_lines("sample.txt"), debug=True))
+        self.assertEqual(0, part1(read_input_lines("sample.txt")))
 
     def test_part1_input(self):
-        self.assertEqual(411, part1(read_input_lines("input.txt"), debug=False))
+        self.assertEqual(1, part1(read_input_lines("input.txt")))
 
     def test_part2_sample(self):
-        self.assertEqual(7, part2(read_input_lines("sample.txt")))
+        self.assertEqual(2, part2(read_input_lines("sample.txt")))
 
     def test_part2_input(self):
-        # 1289 is too low
         self.assertEqual(4, part2(read_input_lines("input.txt")))
 
 

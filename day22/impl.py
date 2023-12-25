@@ -133,6 +133,21 @@ def fall(cubes, debug=False):
 
     return new_cubes
 
+
+def get_removable_cube_ids(cubes, supporting, supported_by):
+    removable = {}
+    for cube in cubes:
+        blocks, id = cube
+        if len(supporting[id]) == 0:
+            removable[id] = True
+            continue
+        else:
+            if all([len(supported_by[supporting_]) > 1 for supporting_ in supporting[id]]):
+                removable[id] = True
+                continue
+    return removable
+
+
 def part1(lines, debug=False):
     global supporting, supported_by
 
@@ -151,16 +166,7 @@ def part1(lines, debug=False):
     print(f"supporting = {supporting}")
     print(f"supported_by = {supported_by}")
 
-    removable = {}
-    for cube in cubes:
-        blocks, id = cube
-        if len(supporting[id]) == 0:
-            removable[id] = True
-            continue
-        else:
-            if all([len(supported_by[supporting_]) > 1 for supporting_ in supporting[id]]):
-                removable[id] = True
-                continue
+    removable = get_removable_cube_ids(cubes, supporting, supported_by)
 
     removable_str = [ f"{id} ({names[id]})" for id in removable.keys()]
     print(f"removable = {removable_str}")
@@ -170,7 +176,33 @@ def part1(lines, debug=False):
 
 
 def part2(lines):
-    return 4
+    global supporting, supported_by
+
+    cubes = fall(extract(lines), False)
+
+    removable = get_removable_cube_ids(cubes, supporting, supported_by)
+
+    total_fall_if_removed = 0
+    fallen = {}
+    for c in [cube for cube in cubes if cube[1] not in removable]:
+        blocks, id = c
+        if c[1] in fallen:
+            continue
+        falling = [id]
+        current_total_falling = 0
+        while falling:
+            current_cube_id = falling.pop(0)
+            fallen[id] = True
+            current_total_falling += 1
+            for supporting_ in [s for s in supporting[current_cube_id] if all([supp_by in fallen for supp_by in supported_by[s]])]:
+                falling.append(supporting_)
+
+        total_fall_if_removed += current_total_falling
+
+    return total_fall_if_removed
+
+
+
 
 
 if __name__ == '__main__':
