@@ -27,8 +27,7 @@ class BasicAStar(AStar):
                 return 1
 
             sub_astar = BasicAStar(self.nodes)
-            return len(list(sub_astar.astar(current, goal))) - 1
-
+            return len(list(sub_astar.astar(current, goal))) * 2
         return 1
 
     def is_goal_reached(self, current, goal):

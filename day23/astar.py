@@ -54,7 +54,7 @@ class OpenSet(Generic[SNType]):
         self.sortedlist.add(item)
 
     def pop(self) -> SNType:
-        item = self.sortedlist.pop(0)
+        item = self.sortedlist.pop()
         item.in_openset = False
         return item
 
