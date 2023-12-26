@@ -183,21 +183,19 @@ def part2(lines):
     removable = get_removable_cube_ids(cubes, supporting, supported_by)
 
     total_fall_if_removed = 0
-    fallen = {}
     for c in [cube for cube in cubes if cube[1] not in removable]:
         blocks, id = c
-        if c[1] in fallen:
-            continue
+        fallen = {}
         falling = [id]
         current_total_falling = 0
         while falling:
             current_cube_id = falling.pop(0)
-            fallen[id] = True
+            fallen[current_cube_id] = True
             current_total_falling += 1
             for supporting_ in [s for s in supporting[current_cube_id] if all([supp_by in fallen for supp_by in supported_by[s]])]:
                 falling.append(supporting_)
 
-        total_fall_if_removed += current_total_falling
+        total_fall_if_removed += current_total_falling-1
 
     return total_fall_if_removed
 
