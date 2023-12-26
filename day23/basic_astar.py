@@ -3,8 +3,9 @@ from astar import AStar
 
 
 class BasicAStar(AStar):
-    def __init__(self, nodes):
+    def __init__(self, nodes, use_adminissible_heuristic=False):
         self.nodes = nodes
+        self.use_adminissible_heuristic = use_adminissible_heuristic
 
     def neighbors(self, n):
         for n1, d in self.nodes[n]:
@@ -16,6 +17,18 @@ class BasicAStar(AStar):
                 return d
 
     def heuristic_cost_estimate(self, current, goal):
+
+        # https://cs.stackexchange.com/questions/28336/longest-path-a-admissible-heuristics-and-optimalness
+        # day 23 : adminissible heuristic
+        if self.use_adminissible_heuristic:
+            if current == goal:
+                return 0
+            if goal in self.nodes[current]:
+                return 1
+
+            sub_astar = BasicAStar(self.nodes)
+            return len(list(sub_astar.astar(current, goal))) - 1
+
         return 1
 
     def is_goal_reached(self, current, goal):

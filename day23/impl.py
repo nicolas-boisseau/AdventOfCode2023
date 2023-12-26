@@ -1,9 +1,22 @@
 import os.path
+import sys
 
 from common.common import download_input_if_not_exists, post_answer, capture, capture_all, read_input_lines
-from day23.astar_test import BasicAStar
+from day23.basic_astar import BasicAStar
 
 download_input_if_not_exists(2023)
+
+#sys.setrecursionlimit(10000)
+
+def print_path(lines, path):
+    for y, line in enumerate(lines):
+        for x, c in enumerate(line):
+            if f"{x},{y}" in path:
+                print("O", end="")
+            else:
+                print(c, end="")
+        print()
+    print(flush=True)
 
 def part1(lines):
     nodes = {}
@@ -11,18 +24,26 @@ def part1(lines):
         for x, char in enumerate(line):
             node_key = f"{x},{y}"
             nodes[node_key] = []
-            if x > 0:
+            if x > 0 and line[x-1] != "#" and lines[y][x] in [".", "<"]:
                 nodes[node_key].append((f"{x-1},{y}", 1))
-            if y > 0:
+            if y > 0 and lines[y-1][x] != "#" and lines[y][x] in [".", "^"]:
                 nodes[node_key].append((f"{x},{y-1}", 1))
-            if x < len(line)-1:
+            if x < len(line)-1 and line[x+1] != "#" and lines[y][x] in [".", ">"]:
                 nodes[node_key].append((f"{x+1},{y}", 1))
-            if y < len(lines)-1:
+            if y < len(lines)-1 and lines[y+1][x] != "#" and lines[y][x] in [".", "v"]:
                 nodes[node_key].append((f"{x},{y+1}", 1))
 
-    astar = BasicAStar(nodes)
+    astar = BasicAStar(nodes, use_adminissible_heuristic=True)
 
-    return 0
+    start = "1,0"
+    end = f"{len(lines[0])-2},{len(lines)-1}"
+    path = list(astar.astar(start, end))
+
+    print_path(lines, path)
+
+    print(path)
+
+    return len(path) - 1
 
 def part2(lines):
     return 4
