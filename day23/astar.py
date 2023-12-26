@@ -54,7 +54,7 @@ class OpenSet(Generic[SNType]):
         self.sortedlist.add(item)
 
     def pop(self) -> SNType:
-        item = self.sortedlist.pop()
+        item = self.sortedlist.pop() # day 23 : use pop() instead of pop(0) to get the greatest fscore instead of the lowest
         item.in_openset = False
         return item
 
